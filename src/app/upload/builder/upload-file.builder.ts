@@ -1,4 +1,4 @@
-import * as sharp from 'sharp'
+import sharp from 'sharp'
 
 import { IUploadSize } from '@app/upload/builder/upload-size.builder'
 

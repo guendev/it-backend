@@ -9,13 +9,19 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
 import { NotifyModule } from '@app/notify/notify.module'
 import { ConfigModule } from '@nestjs/config'
 import { PubSubModule } from '@apollo/pubsub.module'
-import { CategoriesModule } from './app/categories/categories.module';
-import { UploadModule } from './app/upload/upload.module';
+import { CategoriesModule } from '@app/categories/categories.module'
+import { UploadModule } from '@app/upload/upload.module'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path'
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../../', 'public'),
+      exclude: ['/graphql*']
+    }),
     ApolloModule,
     UsersModule,
     DatabaseModule,

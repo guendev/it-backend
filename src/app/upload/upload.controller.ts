@@ -4,6 +4,7 @@ import {
   Post,
   Request,
   UploadedFile,
+  UseGuards,
   UseInterceptors
 } from '@nestjs/common'
 import * as fs from 'fs'
@@ -14,6 +15,7 @@ import { UploadSizeBuilder } from '@app/upload/builder/upload-size.builder'
 import { UploadNameBuilder } from '@app/upload/builder/upload-name.builder'
 import { UploadFileBuilder } from '@app/upload/builder/upload-file.builder'
 import { UploadService } from '@app/upload/upload.service'
+import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
 
 @Controller('upload')
 export class UploadController {
@@ -21,6 +23,7 @@ export class UploadController {
 
   @Post('single')
   @UseInterceptors(uploadSingleFilter)
+  @UseGuards(FirebaseAuthGuard)
   async single(
     @UploadedFile() file: Express.Multer.File,
     @Body('endpoint') endpoint: UploadSingleEnum,
@@ -40,6 +43,8 @@ export class UploadController {
     fs.mkdirSync(`public${name.pathName}`, { recursive: true })
     fs.writeFileSync(`public${fullName}`, resized)
 
-    return {}
+    return {
+      file: fullName
+    }
   }
 }
