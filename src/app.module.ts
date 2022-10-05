@@ -13,6 +13,8 @@ import { CategoriesModule } from '@app/categories/categories.module'
 import { UploadModule } from '@app/upload/upload.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
+import { TechnologiesModule } from './app/technologies/technologies.module';
+import { PlatformsModule } from './app/platforms/platforms.module';
 
 @Module({
   imports: [
@@ -29,7 +31,9 @@ import { join } from 'path'
     NotifyModule,
     PubSubModule,
     CategoriesModule,
-    UploadModule
+    UploadModule,
+    TechnologiesModule,
+    PlatformsModule
   ],
   controllers: [AppController],
   providers: [AppService, FirebaseAuthStrategy]

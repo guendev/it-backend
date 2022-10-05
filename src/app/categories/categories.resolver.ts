@@ -13,6 +13,7 @@ import ChanelEnum from '@apollo/chanel.enum'
 import { CurrentUser } from '@decorators/user.decorator'
 import { UserDocument } from '@app/users/entities/user.entity'
 import { TestUser } from '@decorators/public.decorator'
+import { DeleteCategoryInput } from '@app/categories/dto/delete-category.input'
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -23,7 +24,6 @@ export class CategoriesResolver {
 
   @Mutation(() => Category)
   @UseGuards(FirebaseAuthGuard)
-  @TestUser()
   async createCategory(
     @Args('input', new InputValidator())
     input: CreateCategoryInput,
@@ -50,7 +50,10 @@ export class CategoriesResolver {
   }
 
   @Mutation(() => Category)
-  async updateCategory(@Args('input') input: UpdateCategoryInput) {
+  @UseGuards(FirebaseAuthGuard)
+  async updateCategory(
+    @Args('input', new InputValidator()) input: UpdateCategoryInput
+  ) {
     const _category = await this.categoriesService.findOne({ _id: input.id })
     if (!_category) {
       throw new NotFoundError('Category not found')
@@ -62,5 +65,18 @@ export class CategoriesResolver {
     })
     delete _form.id
     return this.categoriesService.update({ _id: _category._id }, _form)
+  }
+
+  @Mutation(() => Category)
+  @UseGuards(FirebaseAuthGuard)
+  async removeCategory(
+    @Args('input', new InputValidator()) input: DeleteCategoryInput
+  ) {
+    const _category = await this.categoriesService.findOne({ _id: input.id })
+    if (!_category) {
+      throw new NotFoundError('Category not found')
+    }
+    // Todo: Event dọn dẹp
+    return this.categoriesService.remove({ _id: _category._id })
   }
 }

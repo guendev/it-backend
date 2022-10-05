@@ -41,4 +41,8 @@ export class CategoriesService {
   async count(filter: FilterQuery<CategoryDocument>) {
     return this.model.countDocuments(filter)
   }
+
+  async remove(filter: FilterQuery<CategoryDocument>) {
+    return this.model.findByIdAndDelete(filter)
+  }
 }
