@@ -1,7 +1,13 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql'
+import { IsNotEmpty, IsOptional } from 'class-validator'
 
 @InputType()
 export class CreatePlatformInput {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
+  @Field()
+  @IsNotEmpty()
+  name: string
+
+  @Field()
+  @IsOptional()
+  content: string
 }
