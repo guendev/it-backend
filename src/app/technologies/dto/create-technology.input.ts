@@ -1,7 +1,20 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { InputType, Field, ID } from '@nestjs/graphql'
+import { IsNotEmpty, IsOptional } from 'class-validator'
+import { IsObjectID } from '@shared/validator/objectid.validator'
+import { Types } from 'mongoose'
 
 @InputType()
 export class CreateTechnologyInput {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
+  @Field(() => ID)
+  @IsNotEmpty()
+  @IsObjectID()
+  id: Types.ObjectId
+
+  @Field()
+  @IsNotEmpty()
+  name: string
+
+  @Field()
+  @IsOptional()
+  content: string
 }
