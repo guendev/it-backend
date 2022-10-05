@@ -8,7 +8,7 @@ export class CreateTechnologyInput {
   @Field(() => ID)
   @IsNotEmpty()
   @IsObjectID()
-  id: Types.ObjectId
+  platform: Types.ObjectId
 
   @Field()
   @IsNotEmpty()

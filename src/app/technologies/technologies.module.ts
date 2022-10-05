@@ -6,6 +6,7 @@ import {
   Technology,
   TechnologyEntity
 } from '@app/technologies/entities/technology.entity'
+import { PlatformsModule } from '@app/platforms/platforms.module'
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import {
           return schema
         }
       }
-    ])
+    ]),
+    PlatformsModule
   ],
   providers: [TechnologiesResolver, TechnologiesService]
 })

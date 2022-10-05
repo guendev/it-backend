@@ -20,6 +20,7 @@ import {
       }
     ])
   ],
-  providers: [PlatformsResolver, PlatformsService]
+  providers: [PlatformsResolver, PlatformsService],
+  exports: [PlatformsService]
 })
 export class PlatformsModule {}

@@ -23,7 +23,7 @@ export class PlatformsResolver {
 
   @Query(() => Platform, { name: 'platform' })
   findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.platformsService.findOne(id)
+    //
   }
 
   @Mutation(() => Platform)

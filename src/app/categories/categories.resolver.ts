@@ -12,7 +12,6 @@ import { RedisPubSub } from 'graphql-redis-subscriptions'
 import ChanelEnum from '@apollo/chanel.enum'
 import { CurrentUser } from '@decorators/user.decorator'
 import { UserDocument } from '@app/users/entities/user.entity'
-import { TestUser } from '@decorators/public.decorator'
 import { DeleteCategoryInput } from '@app/categories/dto/delete-category.input'
 
 @Resolver(() => Category)
