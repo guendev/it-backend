@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { TechnologiesService } from './technologies.service'
 import { TechnologiesResolver } from './technologies.resolver'
 import { MongooseModule } from '@nestjs/mongoose'
@@ -20,8 +20,9 @@ import { PlatformsModule } from '@app/platforms/platforms.module'
         }
       }
     ]),
-    PlatformsModule
+    forwardRef(() => PlatformsModule)
   ],
-  providers: [TechnologiesResolver, TechnologiesService]
+  providers: [TechnologiesResolver, TechnologiesService],
+  exports: [TechnologiesService]
 })
 export class TechnologiesModule {}

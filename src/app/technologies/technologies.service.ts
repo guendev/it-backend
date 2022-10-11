@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
-import { UpdateTechnologyInput } from './dto/update-technology.input'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { FilterQuery, Model } from 'mongoose'
 import {
   Technology,
   TechnologyDocument
 } from '@app/technologies/entities/technology.entity'
+import { CreateTechnologyInput } from '@app/technologies/dto/create-technology.input'
 
 @Injectable()
 export class TechnologiesService {
@@ -17,19 +17,22 @@ export class TechnologiesService {
     return this.model.create(doc)
   }
 
-  findAll() {
-    return `This action returns all technologies`
+  async findAll(filter: FilterQuery<TechnologyDocument>) {
+    return this.model.find(filter)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} technology`
+  async findOne(filter: FilterQuery<TechnologyDocument>) {
+    return this.model.findOne(filter)
   }
 
-  update(id: number, updateTechnologyInput: UpdateTechnologyInput) {
-    return `This action updates a #${id} technology`
+  async update(
+    match: FilterQuery<TechnologyDocument>,
+    doc: Partial<CreateTechnologyInput>
+  ) {
+    return this.model.findOneAndUpdate(match, doc, { new: true })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} technology`
+  async remove(filter: FilterQuery<TechnologyDocument>) {
+    return this.model.findByIdAndDelete(filter)
   }
 }

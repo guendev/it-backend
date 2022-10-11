@@ -18,16 +18,19 @@ export class PlatformsService {
     return this.model.create(input)
   }
 
-  findAll() {
-    return `This action returns all platforms`
+  async findAll() {
+    return this.model.find()
   }
 
   async findOne(filter: FilterQuery<PlatformDocument>) {
     return this.model.findOne(filter)
   }
 
-  update(id: number, updatePlatformInput: UpdatePlatformInput) {
-    return `This action updates a #${id} platform`
+  async update(
+    match: FilterQuery<PlatformDocument>,
+    doc: Partial<CreatePlatformInput>
+  ) {
+    return this.model.findOneAndUpdate(match, doc, { new: true })
   }
 
   remove(id: number) {

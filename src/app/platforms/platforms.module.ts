@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { PlatformsService } from './platforms.service'
 import { PlatformsResolver } from './platforms.resolver'
 import { MongooseModule } from '@nestjs/mongoose'
@@ -6,6 +6,7 @@ import {
   Platform,
   PlatformEntity
 } from '@app/platforms/entities/platform.entity'
+import { TechnologiesModule } from '@app/technologies/technologies.module'
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import {
           return schema
         }
       }
-    ])
+    ]),
+    forwardRef(() => TechnologiesModule)
   ],
   providers: [PlatformsResolver, PlatformsService],
   exports: [PlatformsService]

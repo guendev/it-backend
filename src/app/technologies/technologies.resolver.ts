@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql'
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+  Parent
+} from '@nestjs/graphql'
 import { TechnologiesService } from './technologies.service'
 import { Technology } from './entities/technology.entity'
 import { CreateTechnologyInput } from './dto/create-technology.input'
@@ -6,6 +14,8 @@ import { UpdateTechnologyInput } from './dto/update-technology.input'
 import { InputValidator } from '@shared/validator/input.validator'
 import { PlatformsService } from '@app/platforms/platforms.service'
 import { NotFoundError } from '@shared/errors/not-found.error'
+import { RemoveTechnologyInput } from '@app/technologies/dto/remove-technology.input'
+import { Types } from 'mongoose'
 
 @Resolver(() => Technology)
 export class TechnologiesResolver {
@@ -34,23 +44,56 @@ export class TechnologiesResolver {
 
   @Query(() => [Technology], { name: 'technologies' })
   findAll() {
-    return this.technologiesService.findAll()
+    // return this.technologiesService.findAll()
   }
 
   @Query(() => Technology, { name: 'technology' })
   findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.technologiesService.findOne(id)
+    // return this.technologiesService.findOne(id)
   }
 
   @Mutation(() => Technology)
-  updateTechnology(
-    @Args('updateTechnologyInput') updateTechnologyInput: UpdateTechnologyInput
+  async updateTechnology(
+    @Args('input', new InputValidator()) input: UpdateTechnologyInput
   ) {
-    //
+    const _tech = await this.technologiesService.findOne({ _id: input.id })
+    if (!_tech) {
+      throw new NotFoundError('Tech not found')
+    }
+
+    const _form: Partial<UpdateTechnologyInput> = {}
+    Object.entries(input)
+      .filter(([_, value]) => value)
+      .forEach(([key, value]) => (_form[key] = value))
+    delete _form.id
+    if (_form.platform) {
+      const _platform = await this.platformsService.findOne({
+        _id: _form.platform
+      })
+      if (!_platform) {
+        throw new NotFoundError('Platform not found')
+      }
+      _form.platform = _platform._id
+    }
+    return this.technologiesService.update({ _id: _tech._id }, _form)
   }
 
   @Mutation(() => Technology)
-  removeTechnology(@Args('id', { type: () => Int }) id: number) {
-    return this.technologiesService.remove(id)
+  async removeTechnology(
+    @Args('input', new InputValidator()) input: RemoveTechnologyInput
+  ) {
+    const _tech = await this.technologiesService.findOne({ _id: input.id })
+    if (!_tech) {
+      throw new NotFoundError('Tech not found')
+    }
+    // Todo: clear all projects that use this technology
+    return this.technologiesService.remove({ _id: _tech._id })
+  }
+
+  @ResolveField()
+  async platform(@Parent() author: Technology) {
+    return this.platformsService.findOne({
+      _id: new Types.ObjectId(author.platform as unknown as string)
+    })
   }
 }
