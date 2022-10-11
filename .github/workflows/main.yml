@@ -74,7 +74,7 @@ jobs:
             
             echo "Update nginx"
             
-            cp -fr nginx.conf /../../../etc/nginx/conf.d/it-square.conf
+            cp -fr nginx.conf /../../../etc/nginx/conf.d/it-geto.conf
             sed -i "s/%PORT%/${{ secrets.APP_PORT }}/" /../../../etc/nginx/conf.d/it-geto.conf
             sed -i "s/%DOMAIN%/${{ secrets.APP_DOMAIN }}/" /../../../etc/nginx/conf.d/it-geto.conf
             
