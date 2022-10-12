@@ -21,6 +21,10 @@ export class TechnologiesService {
     return this.model.find(filter)
   }
 
+  async findMany(filter: FilterQuery<TechnologyDocument>) {
+    return this.model.find(filter)
+  }
+
   async findOne(filter: FilterQuery<TechnologyDocument>) {
     return this.model.findOne(filter)
   }

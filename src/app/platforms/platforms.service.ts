@@ -22,6 +22,10 @@ export class PlatformsService {
     return this.model.find()
   }
 
+  async findMany(filter: FilterQuery<PlatformDocument>) {
+    return this.model.find(filter)
+  }
+
   async findOne(filter: FilterQuery<PlatformDocument>) {
     return this.model.findOne(filter)
   }
