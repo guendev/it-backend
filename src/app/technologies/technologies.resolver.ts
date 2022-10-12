@@ -43,8 +43,8 @@ export class TechnologiesResolver {
   }
 
   @Query(() => [Technology], { name: 'technologies' })
-  findAll() {
-    // return this.technologiesService.findAll()
+  async findAll() {
+    return this.technologiesService.findAll({})
   }
 
   @Query(() => Technology, { name: 'technology' })
