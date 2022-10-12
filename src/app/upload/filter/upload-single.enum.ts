@@ -1,4 +1,4 @@
 export enum UploadSingleEnum {
-  product = 'product',
+  project = 'project',
   category = 'category'
 }

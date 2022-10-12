@@ -8,10 +8,9 @@ export interface IUploadSize {
 export const UploadSizeBuilder = (endpoint: UploadSingleEnum): IUploadSize => {
   let size = {}
   switch (endpoint) {
-    case UploadSingleEnum.product:
+    case UploadSingleEnum.project:
       size = {
-        width: 500,
-        height: 500
+        width: 1000
       }
       break
     case UploadSingleEnum.category:
