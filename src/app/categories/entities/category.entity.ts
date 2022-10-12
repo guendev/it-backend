@@ -22,7 +22,7 @@ export class Category {
   name: string
 
   @Field()
-  @Prop({ required: true, trim: true })
+  @Prop({ trim: true })
   avatar: string
 
   @Field(() => Boolean)

@@ -7,15 +7,15 @@ export class CreateCategoryInput {
   @IsNotEmpty()
   name: string
 
-  @Field()
-  @IsNotEmpty()
+  @Field({ defaultValue: '' })
+  @IsOptional()
   avatar: string
 
-  @Field()
+  @Field(() => Boolean, { defaultValue: false })
   @IsOptional()
   primary: boolean
 
-  @Field()
+  @Field({ defaultValue: '' })
   @IsOptional()
   content: string
 }
