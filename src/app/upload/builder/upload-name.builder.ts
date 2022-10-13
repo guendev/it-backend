@@ -8,11 +8,12 @@ export interface IUploadName {
 }
 
 export const UploadNameBuilder = (
+  group: string,
   endpoint: string,
   user: UserDocument
 ): IUploadName => {
   return {
-    pathName: `/images/users/${user._id}/${endpoint}`,
+    pathName: `/${group}/users/${user._id}/${endpoint}`,
     fileName: `${uuidv4()}.png`
   }
 }
