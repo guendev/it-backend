@@ -16,6 +16,8 @@ import { join } from 'path'
 import { TechnologiesModule } from './app/technologies/technologies.module';
 import { PlatformsModule } from './app/platforms/platforms.module';
 import { ProjectsModule } from './app/projects/projects.module';
+import { StepModule } from './app/step/step.module';
+import { RolesModule } from './app/roles/roles.module';
 
 @Module({
   imports: [
@@ -35,7 +37,9 @@ import { ProjectsModule } from './app/projects/projects.module';
     UploadModule,
     TechnologiesModule,
     PlatformsModule,
-    ProjectsModule
+    ProjectsModule,
+    StepModule,
+    RolesModule
   ],
   controllers: [AppController],
   providers: [AppService, FirebaseAuthStrategy]

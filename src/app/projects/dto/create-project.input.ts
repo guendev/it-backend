@@ -4,6 +4,7 @@ import {
   ArrayMinSize,
   IsArray,
   IsNotEmpty,
+  IsOptional,
   MinLength
 } from 'class-validator'
 import { Types } from 'mongoose'
@@ -36,9 +37,10 @@ export class CreateProjectInput {
   @IsObjectID({ each: true })
   technologies: Types.ObjectId[]
 
-  @Field(() => [ID])
+  @Field(() => [ID], { defaultValue: [] })
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(1)
+  @ArrayMinSize(0)
   files: string[]
 
   @Field(() => [Float, Float])

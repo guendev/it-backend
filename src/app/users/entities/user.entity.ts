@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
-import { Role } from '@app/users/enum/role.enum'
+import { UserRole } from '@app/users/enum/role.enum'
 import { Field, Float, ID, ObjectType } from '@nestjs/graphql'
 import { uidMiddleware } from '@app/users/middleware/uid.middleware'
 
@@ -36,9 +36,9 @@ export class User {
   @Field(() => String)
   slug: string
 
-  @Prop({ default: Role.USER, index: true })
-  @Field(() => Role, { defaultValue: Role.USER })
-  role: Role.USER
+  @Prop({ default: UserRole.USER, index: true })
+  @Field(() => UserRole, { defaultValue: UserRole.USER })
+  role: UserRole.USER
 
   @Prop()
   @Field(() => String, {

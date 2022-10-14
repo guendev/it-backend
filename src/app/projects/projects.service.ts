@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { CreateProjectInput } from './dto/create-project.input'
 import { UpdateProjectInput } from './dto/update-project.input'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { FilterQuery, Model } from 'mongoose'
 import { Project, ProjectDocument } from '@app/projects/entities/project.entity'
 
 @Injectable()
@@ -23,8 +23,8 @@ export class ProjectsService {
     return `This action returns all projects`
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} project`
+  async findOne(filter: FilterQuery<ProjectDocument>) {
+    return this.model.findOne(filter)
   }
 
   update(id: number, updateProjectInput: UpdateProjectInput) {

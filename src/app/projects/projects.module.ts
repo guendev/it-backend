@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { ProjectsService } from './projects.service'
 import { ProjectsResolver } from './projects.resolver'
 import { MongooseModule } from '@nestjs/mongoose'
@@ -6,6 +6,8 @@ import { TechnologiesModule } from '@app/technologies/technologies.module'
 import { Project, ProjectEntity } from '@app/projects/entities/project.entity'
 import { PlatformsModule } from '@app/platforms/platforms.module'
 import { CategoriesModule } from '@app/categories/categories.module'
+import { StepModule } from '@app/step/step.module'
+import { RolesModule } from '@app/roles/roles.module'
 
 @Module({
   imports: [
@@ -21,8 +23,11 @@ import { CategoriesModule } from '@app/categories/categories.module'
     ]),
     TechnologiesModule,
     PlatformsModule,
-    CategoriesModule
+    CategoriesModule,
+    forwardRef(() => StepModule),
+    forwardRef(() => RolesModule)
   ],
-  providers: [ProjectsResolver, ProjectsService]
+  providers: [ProjectsResolver, ProjectsService],
+  exports: [ProjectsService]
 })
 export class ProjectsModule {}

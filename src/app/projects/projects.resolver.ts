@@ -1,5 +1,13 @@
 import { Types } from 'mongoose'
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql'
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+  Parent
+} from '@nestjs/graphql'
 import { ProjectsService } from './projects.service'
 import { Project } from './entities/project.entity'
 import { CreateProjectInput } from './dto/create-project.input'
@@ -7,13 +15,15 @@ import { UpdateProjectInput } from './dto/update-project.input'
 import { InputValidator } from '@shared/validator/input.validator'
 import { CategoriesService } from '@app/categories/categories.service'
 import { TechnologiesService } from '@app/technologies/technologies.service'
+import { StepService } from '@app/step/step.service'
 
 @Resolver(() => Project)
 export class ProjectsResolver {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly categoriesService: CategoriesService,
-    private readonly technologiesService: TechnologiesService
+    private readonly technologiesService: TechnologiesService,
+    private readonly stepsService: StepService
   ) {}
 
   @Mutation(() => Project)
@@ -47,8 +57,8 @@ export class ProjectsResolver {
   }
 
   @Query(() => Project, { name: 'project' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.projectsService.findOne(id)
+  async findOne(@Args('project') slug: string) {
+    return this.projectsService.findOne({ slug })
   }
 
   @Mutation(() => Project)
@@ -64,5 +74,19 @@ export class ProjectsResolver {
   @Mutation(() => Project)
   removeProject(@Args('id', { type: () => Int }) id: number) {
     return this.projectsService.remove(id)
+  }
+
+  @ResolveField()
+  async steps(@Parent() author: Project) {
+    return this.stepsService.findMany({
+      project: new Types.ObjectId(author.id)
+    })
+  }
+
+  @ResolveField()
+  async roles(@Parent() author: Project) {
+    return this.stepsService.findMany({
+      project: new Types.ObjectId(author.id)
+    })
   }
 }

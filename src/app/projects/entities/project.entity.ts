@@ -9,6 +9,8 @@ import {
   Technology,
   TechnologyDocument
 } from '@app/technologies/entities/technology.entity'
+import { Step, StepDocument } from '@app/step/entities/step.entity'
+import { Role, RoleDocument } from '@app/roles/entities/role.entity'
 
 export type ProjectDocument = Project & Document
 
@@ -55,6 +57,12 @@ export class Project {
   })
   @Field(() => [Technology])
   technologies: TechnologyDocument[]
+
+  @Field(() => [Step])
+  steps: StepDocument[]
+
+  @Field(() => [Role])
+  roles: RoleDocument[]
 
   @Field(() => [String])
   @Prop({ type: [String] })
