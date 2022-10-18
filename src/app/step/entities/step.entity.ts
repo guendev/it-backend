@@ -44,6 +44,10 @@ export class Step {
   @Prop({ type: Number, index: true })
   order: number
 
+  @Field(() => String)
+  @Prop({ type: String, default: '' })
+  content: number
+
   @Field(() => Float)
   @Prop({ type: Number, index: true })
   createdAt: number

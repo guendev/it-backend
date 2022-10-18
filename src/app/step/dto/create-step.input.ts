@@ -18,4 +18,8 @@ export class StepDocInput {
   @Field(() => StepStatus, { defaultValue: StepStatus.WAITING })
   @IsOptional()
   status: StepStatus
+
+  @Field(() => String, { defaultValue: '' })
+  @IsOptional()
+  content: string
 }

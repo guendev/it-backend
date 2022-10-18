@@ -7,6 +7,8 @@ import { CreateStepsInput } from '@app/step/dto/create-steps.input'
 import { InputValidator } from '@shared/validator/input.validator'
 import { ProjectsService } from '@app/projects/projects.service'
 import { Types } from 'mongoose'
+import { CheckStepInput } from '@app/step/dto/check-step.input'
+import { StepStatus } from '@app/step/enums/project.status.enum'
 
 @Resolver(() => Step)
 export class StepResolver {
@@ -30,7 +32,9 @@ export class StepResolver {
     if (!_project) {
       throw new Error('Project not found')
     }
-    const _steps = await this.stepService.findMany({ project: input.project })
+    const _steps = await this.stepService.findMany({
+      project: new Types.ObjectId(input.project)
+    })
     const _lastOrder = _steps.sort((a, b) => b.order - a.order)[0]?.order || 0
     //
     return await Promise.all(
@@ -62,7 +66,20 @@ export class StepResolver {
 
   @Mutation(() => Step)
   updateStep(@Args('updateStepInput') updateStepInput: UpdateStepInput) {
-    return this.stepService.update(updateStepInput.id, updateStepInput)
+    // return this.stepService.update(updateStepInput.id, updateStepInput)
+  }
+
+  @Mutation(() => Step)
+  async checkStep(@Args('input', new InputValidator()) input: CheckStepInput) {
+    // Todo: check auth, event, etc
+    const _step = await this.stepService.update(
+      { _id: new Types.ObjectId(input.id) },
+      { status: StepStatus.DONE }
+    )
+    if (!_step) {
+      throw new Error('Step not found')
+    }
+    return _step
   }
 
   @Mutation(() => Step)

@@ -3,6 +3,7 @@ import { UpdateStepInput } from './dto/update-step.input'
 import { InjectModel } from '@nestjs/mongoose'
 import { FilterQuery, Model } from 'mongoose'
 import { Step, StepDocument } from '@app/step/entities/step.entity'
+import { CreateCategoryInput } from '@app/categories/dto/create-category.input'
 
 @Injectable()
 export class StepService {
@@ -28,8 +29,18 @@ export class StepService {
     return this.model.find(filter).sort({ order: 1, _id: 1 })
   }
 
-  update(id: number, updateStepInput: UpdateStepInput) {
-    return `This action updates a #${id} step`
+  async update(
+    match: FilterQuery<StepDocument>,
+    doc: Partial<Pick<StepDocument, 'name' | 'status' | 'order'>>
+  ) {
+    return this.model.findOneAndUpdate(
+      match,
+      {
+        ...doc,
+        updatedAt: Date.now()
+      },
+      { new: true }
+    )
   }
 
   remove(id: number) {
