@@ -20,12 +20,12 @@ export class TechnologiesResolver {
   }
 
   @Query(() => [Technology], { name: 'technologies' })
-  async findAll() {
+  async findMany() {
     return this.technologiesService.findAll({})
   }
 
   @Query(() => Technology, { name: 'technology' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  async findOne(@Args('id', { type: () => Int }) id: number) {
     // return this.technologiesService.findOne(id)
   }
 
@@ -37,22 +37,7 @@ export class TechnologiesResolver {
     if (!_tech) {
       throw new NotFoundError('Tech not found')
     }
-
-    // const _form: Partial<UpdateTechnologyInput> = {}
-    // Object.entries(input)
-    //   .filter(([_, value]) => value)
-    //   .forEach(([key, value]) => (_form[key] = value))
-    // delete _form.id
-    // if (_form.platform) {
-    //   const _platform = await this.platformsService.findOne({
-    //     _id: _form.platform
-    //   })
-    //   if (!_platform) {
-    //     throw new NotFoundError('Platform not found')
-    //   }
-    //   _form.platform = _platform._id
-    // }
-    //return this.technologiesService.update({ _id: _tech._id }, _form)
+    // Todo: update tech
   }
 
   @Mutation(() => Technology)
