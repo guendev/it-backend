@@ -27,11 +27,18 @@ export class ProjectsService {
     return this.model.findOne(filter)
   }
 
-  update(id: number, updateProjectInput: UpdateProjectInput) {
-    return `This action updates a #${id} project`
+  async update(project: ProjectDocument, doc: UpdateProjectInput) {
+    return this.model.findByIdAndUpdate(
+      project._id,
+      {
+        ...doc,
+        updatedAt: Date.now()
+      },
+      { new: true }
+    )
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} project`
+  async remove(project: ProjectDocument) {
+    return this.model.findByIdAndDelete(project._id)
   }
 }

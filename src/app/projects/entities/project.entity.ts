@@ -58,12 +58,6 @@ export class Project {
   @Field(() => [Technology])
   technologies: TechnologyDocument[]
 
-  @Field(() => [Step])
-  steps: StepDocument[]
-
-  @Field(() => [Role])
-  roles: RoleDocument[]
-
   @Field(() => [String])
   @Prop({ type: [String] })
   files: string[]
@@ -80,15 +74,13 @@ export class Project {
   @Prop({ type: Number, index: true })
   updatedAt: number
 
-  // Meta data
-  // @Prop({
-  //   index: true,
-  //   default: ProjectStatus.ON_GOING,
-  //   type: String,
-  //   enum: ProjectStatus
-  // })
-  // @Field(() => ProjectStatus, { defaultValue: ProjectStatus.ON_GOING })
-  // status: ProjectStatus
+  // GraphQL
+  @Field(() => [Step])
+  steps: StepDocument[]
+
+  // GraphQL
+  @Field(() => [Role])
+  roles: RoleDocument[]
 }
 
 export const ProjectEntity = SchemaFactory.createForClass(Project)

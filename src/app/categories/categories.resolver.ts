@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql'
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql'
 import { CategoriesService } from './categories.service'
 import { Category } from './entities/category.entity'
 import { CreateCategoryInput } from './dto/create-category.input'
@@ -9,9 +9,6 @@ import { Inject, UseGuards } from '@nestjs/common'
 import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
 import { PUB_SUB } from '@apollo/pubsub.module'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
-import ChanelEnum from '@apollo/chanel.enum'
-import { CurrentUser } from '@decorators/user.decorator'
-import { UserDocument } from '@app/users/entities/user.entity'
 import { DeleteCategoryInput } from '@app/categories/dto/delete-category.input'
 
 @Resolver(() => Category)
@@ -25,12 +22,8 @@ export class CategoriesResolver {
   @UseGuards(FirebaseAuthGuard)
   async createCategory(
     @Args('input', new InputValidator())
-    input: CreateCategoryInput,
-    @CurrentUser() user: UserDocument
+    input: CreateCategoryInput
   ) {
-    await this.pubSub.publish(ChanelEnum.NOTIFY, {
-      subNotify: { msg: 'Huỷ thành công', user }
-    })
     return this.categoriesService.create(input)
   }
 

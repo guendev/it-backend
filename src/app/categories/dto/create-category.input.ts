@@ -9,13 +9,5 @@ export class CreateCategoryInput {
 
   @Field({ defaultValue: '' })
   @IsOptional()
-  avatar: string
-
-  @Field(() => Boolean, { defaultValue: false })
-  @IsOptional()
-  primary: boolean
-
-  @Field({ defaultValue: '' })
-  @IsOptional()
   content: string
 }

@@ -22,14 +22,6 @@ export class Category {
   name: string
 
   @Field()
-  @Prop({ trim: true })
-  avatar: string
-
-  @Field(() => Boolean)
-  @Prop({ default: false, index: true })
-  primary: boolean
-
-  @Field()
   @Prop({ slug: 'name', unique: true })
   slug: string
 
