@@ -37,7 +37,7 @@ export class RolesService {
     )
   }
 
-  async remove(id: number) {
-    return `This action removes a #${id} role`
+  async remove(role: RoleDocument) {
+    return this.model.findByIdAndDelete(role._id)
   }
 }

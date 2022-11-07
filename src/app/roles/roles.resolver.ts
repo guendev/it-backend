@@ -8,6 +8,8 @@ import { ProjectsService } from '@app/projects/projects.service'
 import { Types } from 'mongoose'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { SortRolesInput } from '@app/roles/dto/sort-roles.input'
+import { RemoveRoleInput } from '@app/roles/dto/remove-role.input'
+import { GetRolesInput } from '@app/roles/dto/get-roles.input'
 
 @Resolver(() => Role)
 export class RolesResolver {
@@ -40,13 +42,14 @@ export class RolesResolver {
   }
 
   @Query(() => [Role], { name: 'roles' })
-  findAll() {
-    //return this.rolesService.findAll()
-  }
-
-  @Query(() => Role, { name: 'role' })
-  async findOne(@Args('id', { type: () => Int }) id: number) {
-    // return this.rolesService.findOne(id)
+  async findAll(@Args('filter', new InputValidator()) input: GetRolesInput) {
+    const _project = await this.projectsService.findOne({
+      _id: new Types.ObjectId(input.project)
+    })
+    if (!_project) {
+      throw new NotFoundError('Project không tồn tại')
+    }
+    return this.rolesService.find({ project: _project._id })
   }
 
   @Mutation(() => Role)
@@ -97,7 +100,16 @@ export class RolesResolver {
   }
 
   @Mutation(() => Role)
-  removeRole(@Args('id', { type: () => Int }) id: number) {
-    return this.rolesService.remove(id)
+  async removeRole(
+    @Args('input', new InputValidator()) input: RemoveRoleInput
+  ) {
+    const _role = await this.rolesService.findOne({
+      _id: new Types.ObjectId(input.id)
+    })
+    if (!_role) {
+      throw new NotFoundError('Role không tồn tại')
+    }
+    // Todo: check permission
+    return this.rolesService.remove(_role)
   }
 }
