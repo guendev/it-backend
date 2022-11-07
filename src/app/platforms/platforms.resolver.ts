@@ -62,39 +62,39 @@ export class PlatformsResolver {
   async updateGridPlatform(
     @Args('input', new InputValidator()) input: UpdateGridPlatformInput
   ) {
-    const list: {
-      parent: Types.ObjectId
-      _id: Types.ObjectId
-    }[] = input.map
-      .filter((item) => Types.ObjectId.isValid(item.id))
-      .map((item) => ({
-        _id: new Types.ObjectId(item.id),
-        children: item.children
-          .filter((id) => Types.ObjectId.isValid(id))
-          .map((id) => new Types.ObjectId(id))
-      }))
-      .reduce((acc, item) => {
-        acc.push(
-          ...item.children.map((child) => ({
-            parent: item._id,
-            _id: child
-          }))
-        )
-        return acc
-      }, [])
-
-    const result = await Promise.all<Platform>(
-      list.map(
-        (parent) =>
-          new Promise((resolve) => {
-            this.technologiesService
-              .update({ _id: parent._id }, { platform: parent.parent })
-              .then((item) => resolve(item as unknown as Platform))
-          })
-      )
-    )
-
-    return result.filter((item) => item)
+    // const list: {
+    //   parent: Types.ObjectId
+    //   _id: Types.ObjectId
+    // }[] = input.map
+    //   .filter((item) => Types.ObjectId.isValid(item.id))
+    //   .map((item) => ({
+    //     _id: new Types.ObjectId(item.id),
+    //     children: item.children
+    //       .filter((id) => Types.ObjectId.isValid(id))
+    //       .map((id) => new Types.ObjectId(id))
+    //   }))
+    //   .reduce((acc, item) => {
+    //     acc.push(
+    //       ...item.children.map((child) => ({
+    //         parent: item._id,
+    //         _id: child
+    //       }))
+    //     )
+    //     return acc
+    //   }, [])
+    //
+    // const result = await Promise.all<Platform>(
+    //   list.map(
+    //     (parent) =>
+    //       new Promise((resolve) => {
+    //         this.technologiesService
+    //           .update({ _id: parent._id }, { platform: parent.parent })
+    //           .then((item) => resolve(item as unknown as Platform))
+    //       })
+    //   )
+    // )
+    //
+    // return result.filter((item) => item)
   }
 
   @Mutation(() => Platform)

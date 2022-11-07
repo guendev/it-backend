@@ -17,8 +17,4 @@ export class UpdateTechnologyInput {
   @Field()
   @IsOptional()
   content: string
-
-  @Field(() => ID)
-  @IsOptional()
-  platform: Types.ObjectId
 }

@@ -12,8 +12,8 @@
     "start:prod": "node dist/src/main",
     "dev": "nest start --watch",
     "preview": "node dist/main",
-    "apollo:pull": "npx apollo client:download-schema --endpoint=http://localhost:3000/graphql schema.graphql",
-    "apollo:commit": "APOLLO_KEY=service:IT-Square:XQ3OcH7qcJaFCFRaIklEWA \\\n  rover subgraph publish IT-Square@current \\\n  --schema ./schema.graphql \\\n  --name your-subgraph-name \\\n  --routing-url http://products.prod.svc.cluster.local:4001/graphql",
+    "apollo:pull": "npx apollo client:download-schema --endpoint=http://localhost:5001/graphql schema.graphql",
+    "apollo:commit": "APOLLO_KEY=service:II-Geto:_5ntoD4zyBp3k2mFjv8NVA \\\n  rover subgraph publish II-Geto@current \\\n  --schema ./schema.graphql \\\n  --name schema \\\n  --routing-url http://products.prod.svc.cluster.local:4001/graphql",
     "stop": "pm2 stop it-geto",
     "restart": "pm2 restart it-geto"
   },

@@ -18,6 +18,7 @@ export class CreateProjectInput {
   name: string
 
   @Field(() => [String])
+  @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)
   covers: string[]

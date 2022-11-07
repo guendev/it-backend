@@ -27,7 +27,7 @@ export class Role {
   @Prop({
     index: true,
     default: [],
-    type: [String],
+    type: [Number],
     enum: PermissionEnum
   })
   @Field(() => [PermissionEnum], { defaultValue: [] })
@@ -39,7 +39,7 @@ export class Role {
     index: true
   })
   @Field(() => Project)
-  project: ProjectDocument
+  project: ProjectDocument | Types.ObjectId
 
   @Field(() => Float)
   @Prop({ type: Number, index: true })

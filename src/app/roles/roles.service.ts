@@ -1,26 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRoleInput } from './dto/create-role.input';
-import { UpdateRoleInput } from './dto/update-role.input';
+import { Injectable } from '@nestjs/common'
+import { UpdateRoleInput } from './dto/update-role.input'
+import { InjectModel } from '@nestjs/mongoose'
+import { FilterQuery, Model } from 'mongoose'
+import { Role, RoleDocument } from '@app/roles/entities/role.entity'
 
 @Injectable()
 export class RolesService {
-  create(createRoleInput: CreateRoleInput) {
-    return 'This action adds a new role';
+  constructor(@InjectModel(Role.name) private model: Model<RoleDocument>) {}
+
+  async create(
+    input: Pick<Role, 'name' | 'permissions' | 'order' | 'project'>
+  ) {
+    return this.model.create({
+      ...input,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    })
   }
 
-  findAll() {
-    return `This action returns all roles`;
+  async find(filter: FilterQuery<RoleDocument>) {
+    return this.model.find(filter)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
+  async findOne(filter: FilterQuery<RoleDocument>) {
+    return this.model.findOne(filter)
   }
 
-  update(id: number, updateRoleInput: UpdateRoleInput) {
-    return `This action updates a #${id} role`;
+  async update(role: RoleDocument, doc: Omit<UpdateRoleInput, 'id'>) {
+    return this.model.findByIdAndUpdate(
+      role._id,
+      {
+        ...doc,
+        updatedAt: Date.now()
+      },
+      { new: true }
+    )
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  async remove(id: number) {
+    return `This action removes a #${id} role`
   }
 }
