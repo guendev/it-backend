@@ -3,7 +3,6 @@ import { UpdateStepInput } from './dto/update-step.input'
 import { InjectModel } from '@nestjs/mongoose'
 import { FilterQuery, Model } from 'mongoose'
 import { Step, StepDocument } from '@app/step/entities/step.entity'
-import { CreateCategoryInput } from '@app/categories/dto/create-category.input'
 
 @Injectable()
 export class StepService {
@@ -17,8 +16,8 @@ export class StepService {
     })
   }
 
-  findAll() {
-    return `This action returns all step`
+  async findAll(filter: FilterQuery<StepDocument>) {
+    return this.model.find(filter)
   }
 
   async findOne(filter: FilterQuery<StepDocument>) {

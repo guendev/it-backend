@@ -39,13 +39,21 @@ export class StepResolver {
     })
   }
 
-  @Query(() => [Step], { name: 'step' })
-  async findAll() {
-    return this.stepService.findAll()
+  @Query(() => [Step], { name: 'steps' })
+  async findAll(@Args('input', new InputValidator()) input: UpdateStepInput) {
+    const _project = await this.projectService.findOne({
+      _id: new Types.ObjectId(input.project)
+    })
+    if (!_project) {
+      throw new Error('Project not found')
+    }
+    return this.stepService.findAll({ project: _project._id })
   }
 
   @Mutation(() => Step)
-  async updateStep(@Args('input') input: UpdateStepInput) {
+  async updateStep(
+    @Args('input', new InputValidator()) input: UpdateStepInput
+  ) {
     const _step = await this.stepService.findOne({
       _id: new Types.ObjectId(input.id)
     })

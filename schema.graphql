@@ -1,0 +1,313 @@
+"""Exposes a URL that specifies the behavior of this scalar."""
+directive @specifiedBy(
+  """The URL that specifies the behavior of this scalar."""
+  url: String!
+) on SCALAR
+
+"""
+Direct the client to resolve this field locally, either from the cache or local resolvers.
+"""
+directive @client(
+  """
+  When true, the client will never use the cache for this value. See
+  https://www.apollographql.com/docs/react/essentials/local-state/#forcing-resolvers-with-clientalways-true
+  """
+  always: Boolean
+) on FIELD | FRAGMENT_DEFINITION | INLINE_FRAGMENT
+
+"""
+Export this locally resolved field as a variable to be used in the remainder of this query. See
+https://www.apollographql.com/docs/react/essentials/local-state/#using-client-fields-as-variables
+"""
+directive @export(
+  """The variable name to export this field as."""
+  as: String!
+) on FIELD
+
+"""
+Specify a custom store key for this result. See
+https://www.apollographql.com/docs/react/advanced/caching/#the-connection-directive
+"""
+directive @connection(
+  """Specify the store key."""
+  key: String!
+
+  """
+  An array of query argument names to include in the generated custom store key.
+  """
+  filter: [String!]
+) on FIELD
+
+type Category {
+  avatar: String!
+  content: String
+  id: ID!
+  name: String!
+  primary: Boolean!
+  slug: String!
+}
+
+input CheckStepInput {
+  id: ID!
+}
+
+input CreateCategoryInput {
+  avatar: String = ""
+  content: String = ""
+  name: String!
+  primary: Boolean = false
+}
+
+input CreatePlatformInput {
+  content: String!
+  name: String!
+}
+
+input CreateProjectInput {
+  category: ID!
+  content: String!
+  covers: [String!]!
+  estimate: [Float!]!
+  files: [ID!] = []
+  name: String!
+  technologies: [ID!]!
+}
+
+input CreateRoleInput {
+  name: String!
+
+  """Mảng các quyền...mảng giao động từ 1"""
+  permissions: [PermissionEnum!]!
+  project: ID!
+  user: ID
+}
+
+input CreateStepInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateStepsInput {
+  project: ID!
+  steps: [StepDocInput!]!
+}
+
+input CreateTechnologyInput {
+  content: String!
+  name: String!
+}
+
+input DeleteCategoryInput {
+  id: ID!
+}
+
+type Mutation {
+  checkStep(input: CheckStepInput!): Step!
+  createCategory(input: CreateCategoryInput!): Category!
+  createPlatform(input: CreatePlatformInput!): Platform!
+  createProject(input: CreateProjectInput!): Project!
+  createRole(input: CreateRoleInput!): Role!
+  createStep(createStepInput: CreateStepInput!): Step!
+  createSteps(input: CreateStepsInput!): [Step!]!
+  createTechnology(input: CreateTechnologyInput!): Technology!
+  removeCategory(input: DeleteCategoryInput!): Category!
+  removePlatform(id: Int!): Platform!
+  removeProject(id: Int!): Project!
+  removeRole(id: Int!): Role!
+  removeStep(id: Int!): Step!
+  removeTechnology(input: RemoveTechnologyInput!): Technology!
+  sortRoles(input: SortRolesInput!): [Role!]!
+  updateCategory(input: UpdateCategoryInput!): Category!
+  updateGridPlatform(input: UpdateGridPlatformInput!): [Platform!]!
+  updatePlatform(input: UpdatePlatformInput!): Platform!
+  updateProject(updateProjectInput: UpdateProjectInput!): Project!
+  updateRole(input: UpdateRoleInput!): Role!
+  updateStep(updateStepInput: UpdateStepInput!): Step!
+  updateTechnology(input: UpdateTechnologyInput!): Technology!
+}
+
+type Notify {
+  """Thông báo lỗi hay không"""
+  error: Boolean!
+
+  """Nội dung tin nhắn"""
+  msg: String!
+
+  """Thành viên hiện tại"""
+  user: User!
+}
+
+enum PermissionEnum {
+  ACCEPT_MEMBER
+  CREATE_ROLE
+  REMOVE_MEMBER
+  REMOVE_PROJECT
+  REMOVE_ROLE
+  UPDATE_PROJECT
+  UPDATE_ROLE
+}
+
+type Platform {
+  children: [Technology!]
+  content: String
+  id: ID!
+  name: String!
+  slug: String!
+}
+
+type Project {
+  category: Category!
+  content: String
+  covers: [String!]!
+  createdAt: Float!
+  estimate: [Float!]!
+  files: [String!]!
+  id: ID!
+  name: String!
+  roles: [Role!]!
+  slug: String!
+  steps: [Step!]!
+  technologies: [Technology!]!
+  updatedAt: Float!
+}
+
+type Query {
+  categories: [Category!]!
+  category(category: String!): Category!
+  me: User!
+  platform(id: Int!): Platform!
+  platforms: [Platform!]!
+  project(project: String!): Project!
+  projects: [Project!]!
+  role(id: Int!): Role!
+  roles: [Role!]!
+  step(id: Int!): Step!
+  technologies: [Technology!]!
+  technology(id: Int!): Technology!
+}
+
+input RemoveTechnologyInput {
+  id: ID!
+}
+
+type Role {
+  createdAt: Float!
+  id: ID!
+  name: String!
+  order: Float!
+  permissions: [PermissionEnum!]!
+  project: Project!
+  updatedAt: Float!
+}
+
+input SortRolesInput {
+  roles: [ID!]!
+}
+
+type Step {
+  content: String!
+  createdAt: Float!
+  id: ID!
+  name: String!
+  order: Float!
+  project: Project!
+  status: StepStatus!
+  updatedAt: Float!
+}
+
+input StepDocInput {
+  content: String = ""
+  name: String!
+  status: StepStatus = WAITING
+}
+
+enum StepStatus {
+  DONE
+  WAITING
+}
+
+type Subscription {
+  """Nhận thông báo"""
+  subNotify: Notify!
+}
+
+type Technology {
+  content: String
+  id: ID!
+  name: String!
+  slug: String!
+}
+
+input UpdateCategoryInput {
+  avatar: String = ""
+  content: String = ""
+  id: ID!
+  name: String
+  primary: Boolean = false
+}
+
+input UpdateGridPlatformInput {
+  map: [UpdateGridPlatformInputItem!]!
+}
+
+input UpdateGridPlatformInputItem {
+  children: [ID!]!
+  id: String!
+}
+
+input UpdatePlatformInput {
+  content: String
+  id: ID!
+  name: String
+}
+
+input UpdateProjectInput {
+  category: ID
+  content: String
+  covers: [String!]
+  estimate: [Float!]
+  files: [ID!] = []
+  id: Int!
+  name: String
+  technologies: [ID!]
+}
+
+input UpdateRoleInput {
+  id: ID!
+  name: String
+
+  """Mảng các quyền...mảng giao động từ 1"""
+  permissions: [PermissionEnum!]
+  user: ID
+}
+
+input UpdateStepInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateTechnologyInput {
+  content: String!
+  id: ID!
+  name: String!
+}
+
+type User {
+  avatar: String
+  createdAt: Float!
+  id: ID!
+  name: String!
+  role: UserRole!
+  slug: String!
+
+  """Firebase ID"""
+  uid: String!
+}
+
+enum UserRole {
+  ADMIN
+  AUTHOR
+  SP_ADMIN
+  USER
+}
