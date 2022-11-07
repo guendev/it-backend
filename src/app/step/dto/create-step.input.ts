@@ -1,15 +1,11 @@
-import { InputType, Int, Field } from '@nestjs/graphql'
+import { InputType, Field, ID } from '@nestjs/graphql'
 import { StepStatus } from '@app/step/enums/project.status.enum'
 import { IsNotEmpty, IsOptional, MinLength } from 'class-validator'
+import { IsObjectID } from '@shared/validator/objectid.validator'
+import { Types } from 'mongoose'
 
 @InputType()
 export class CreateStepInput {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number
-}
-
-@InputType()
-export class StepDocInput {
   @Field(() => String)
   @MinLength(3)
   @IsNotEmpty()
@@ -22,4 +18,9 @@ export class StepDocInput {
   @Field(() => String, { defaultValue: '' })
   @IsOptional()
   content: string
+
+  @Field(() => ID)
+  @IsObjectID()
+  @IsNotEmpty()
+  project: Types.ObjectId
 }

@@ -1,7 +1,6 @@
 import { Types } from 'mongoose'
 import {
   Args,
-  Int,
   Mutation,
   Parent,
   Query,

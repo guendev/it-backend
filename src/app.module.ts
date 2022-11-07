@@ -13,11 +13,10 @@ import { CategoriesModule } from '@app/categories/categories.module'
 import { UploadModule } from '@app/upload/upload.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
-import { TechnologiesModule } from './app/technologies/technologies.module';
-import { PlatformsModule } from './app/platforms/platforms.module';
-import { ProjectsModule } from './app/projects/projects.module';
-import { StepModule } from './app/step/step.module';
-import { RolesModule } from './app/roles/roles.module';
+import { TechnologiesModule } from './app/technologies/technologies.module'
+import { ProjectsModule } from './app/projects/projects.module'
+import { StepModule } from './app/step/step.module'
+import { RolesModule } from './app/roles/roles.module'
 
 @Module({
   imports: [
@@ -36,7 +35,6 @@ import { RolesModule } from './app/roles/roles.module';
     CategoriesModule,
     UploadModule,
     TechnologiesModule,
-    PlatformsModule,
     ProjectsModule,
     StepModule,
     RolesModule

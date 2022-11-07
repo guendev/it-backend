@@ -31,7 +31,7 @@ export class StepService {
 
   async update(
     match: FilterQuery<StepDocument>,
-    doc: Partial<Pick<StepDocument, 'name' | 'status' | 'order'>>
+    doc: Omit<UpdateStepInput, 'id'>
   ) {
     return this.model.findOneAndUpdate(
       match,
@@ -43,7 +43,7 @@ export class StepService {
     )
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} step`
+  async remove(step: StepDocument) {
+    return this.model.findByIdAndDelete(step._id)
   }
 }

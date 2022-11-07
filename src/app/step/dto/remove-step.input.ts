@@ -4,7 +4,7 @@ import { IsObjectID } from '@shared/validator/objectid.validator'
 import { Types } from 'mongoose'
 
 @InputType()
-export class CheckStepInput {
+export class RemoveStepInput {
   @Field(() => ID)
   @IsNotEmpty()
   @IsObjectID()

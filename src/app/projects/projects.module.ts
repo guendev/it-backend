@@ -4,7 +4,6 @@ import { ProjectsResolver } from './projects.resolver'
 import { MongooseModule } from '@nestjs/mongoose'
 import { TechnologiesModule } from '@app/technologies/technologies.module'
 import { Project, ProjectEntity } from '@app/projects/entities/project.entity'
-import { PlatformsModule } from '@app/platforms/platforms.module'
 import { CategoriesModule } from '@app/categories/categories.module'
 import { StepModule } from '@app/step/step.module'
 import { RolesModule } from '@app/roles/roles.module'
@@ -22,7 +21,6 @@ import { RolesModule } from '@app/roles/roles.module'
       }
     ]),
     TechnologiesModule,
-    PlatformsModule,
     CategoriesModule,
     forwardRef(() => StepModule),
     forwardRef(() => RolesModule)
