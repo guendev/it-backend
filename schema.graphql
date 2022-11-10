@@ -39,27 +39,14 @@ directive @connection(
 ) on FIELD
 
 type Category {
-  avatar: String!
   content: String
   id: ID!
   name: String!
-  primary: Boolean!
   slug: String!
 }
 
-input CheckStepInput {
-  id: ID!
-}
-
 input CreateCategoryInput {
-  avatar: String = ""
   content: String = ""
-  name: String!
-  primary: Boolean = false
-}
-
-input CreatePlatformInput {
-  content: String!
   name: String!
 }
 
@@ -83,13 +70,10 @@ input CreateRoleInput {
 }
 
 input CreateStepInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input CreateStepsInput {
+  content: String = ""
+  name: String!
   project: ID!
-  steps: [StepDocInput!]!
+  status: StepStatus = WAITING
 }
 
 input CreateTechnologyInput {
@@ -101,28 +85,38 @@ input DeleteCategoryInput {
   id: ID!
 }
 
+input GetProjectsFilter {
+  category: ID
+  limit: Int!
+  name: String
+  offset: Int!
+
+  """Sắp xếp của bình luận"""
+  sort: String!
+  status: ProjectStatus
+  technologies: [ID!]
+}
+
+input GetRolesInput {
+  project: ID!
+}
+
 type Mutation {
-  checkStep(input: CheckStepInput!): Step!
   createCategory(input: CreateCategoryInput!): Category!
-  createPlatform(input: CreatePlatformInput!): Platform!
   createProject(input: CreateProjectInput!): Project!
   createRole(input: CreateRoleInput!): Role!
-  createStep(createStepInput: CreateStepInput!): Step!
-  createSteps(input: CreateStepsInput!): [Step!]!
+  createStep(input: CreateStepInput!): Step!
   createTechnology(input: CreateTechnologyInput!): Technology!
   removeCategory(input: DeleteCategoryInput!): Category!
-  removePlatform(id: Int!): Platform!
-  removeProject(id: Int!): Project!
-  removeRole(id: Int!): Role!
-  removeStep(id: Int!): Step!
+  removeProject(input: RemoveProjectInput!): Project!
+  removeRole(input: RemoveRoleInput!): Role!
+  removeStep(input: RemoveStepInput!): Step!
   removeTechnology(input: RemoveTechnologyInput!): Technology!
   sortRoles(input: SortRolesInput!): [Role!]!
   updateCategory(input: UpdateCategoryInput!): Category!
-  updateGridPlatform(input: UpdateGridPlatformInput!): [Platform!]!
-  updatePlatform(input: UpdatePlatformInput!): Platform!
-  updateProject(updateProjectInput: UpdateProjectInput!): Project!
+  updateProject(input: UpdateProjectInput!): Project!
   updateRole(input: UpdateRoleInput!): Role!
-  updateStep(updateStepInput: UpdateStepInput!): Step!
+  updateStep(input: UpdateStepInput!): Step!
   updateTechnology(input: UpdateTechnologyInput!): Technology!
 }
 
@@ -147,16 +141,11 @@ enum PermissionEnum {
   UPDATE_ROLE
 }
 
-type Platform {
-  children: [Technology!]
-  content: String
-  id: ID!
-  name: String!
-  slug: String!
-}
-
 type Project {
+  active: ProjectActive!
+  bookmarks: Float!
   category: Category!
+  comments: Float!
   content: String
   covers: [String!]!
   createdAt: Float!
@@ -164,26 +153,49 @@ type Project {
   files: [String!]!
   id: ID!
   name: String!
+  owner: User!
   roles: [Role!]!
   slug: String!
+  status: ProjectStatus!
   steps: [Step!]!
   technologies: [Technology!]!
   updatedAt: Float!
+}
+
+enum ProjectActive {
+  ACTIVE
+  DISABLED
+}
+
+enum ProjectStatus {
+  DONE
+  PREPARE
+  RUNNING
+  STUCK
 }
 
 type Query {
   categories: [Category!]!
   category(category: String!): Category!
   me: User!
-  platform(id: Int!): Platform!
-  platforms: [Platform!]!
   project(project: String!): Project!
-  projects: [Project!]!
-  role(id: Int!): Role!
-  roles: [Role!]!
-  step(id: Int!): Step!
+  projects(filter: GetProjectsFilter!): [Project!]!
+  roles(filter: GetRolesInput!): [Role!]!
+  steps(input: UpdateStepInput!): [Step!]!
   technologies: [Technology!]!
   technology(id: Int!): Technology!
+}
+
+input RemoveProjectInput {
+  id: ID!
+}
+
+input RemoveRoleInput {
+  id: ID!
+}
+
+input RemoveStepInput {
+  id: ID!
 }
 
 input RemoveTechnologyInput {
@@ -215,12 +227,6 @@ type Step {
   updatedAt: Float!
 }
 
-input StepDocInput {
-  content: String = ""
-  name: String!
-  status: StepStatus = WAITING
-}
-
 enum StepStatus {
   DONE
   WAITING
@@ -239,24 +245,7 @@ type Technology {
 }
 
 input UpdateCategoryInput {
-  avatar: String = ""
   content: String = ""
-  id: ID!
-  name: String
-  primary: Boolean = false
-}
-
-input UpdateGridPlatformInput {
-  map: [UpdateGridPlatformInputItem!]!
-}
-
-input UpdateGridPlatformInputItem {
-  children: [ID!]!
-  id: String!
-}
-
-input UpdatePlatformInput {
-  content: String
   id: ID!
   name: String
 }
@@ -267,7 +256,7 @@ input UpdateProjectInput {
   covers: [String!]
   estimate: [Float!]
   files: [ID!] = []
-  id: Int!
+  id: ID!
   name: String
   technologies: [ID!]
 }
@@ -282,9 +271,11 @@ input UpdateRoleInput {
 }
 
 input UpdateStepInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  content: String = ""
+  id: ID!
+  name: String
+  project: ID
+  status: StepStatus = WAITING
 }
 
 input UpdateTechnologyInput {

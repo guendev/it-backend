@@ -4,6 +4,8 @@ import { UpdateProjectInput } from './dto/update-project.input'
 import { InjectModel } from '@nestjs/mongoose'
 import { FilterQuery, Model } from 'mongoose'
 import { Project, ProjectDocument } from '@app/projects/entities/project.entity'
+import { FilterOffet } from '@shared/args/filter-offset.input'
+import { UserDocument } from '@app/users/entities/user.entity'
 
 @Injectable()
 export class ProjectsService {
@@ -11,16 +13,21 @@ export class ProjectsService {
     @InjectModel(Project.name) private model: Model<ProjectDocument>
   ) {}
 
-  async create(input: CreateProjectInput) {
+  async create(user: UserDocument, input: CreateProjectInput) {
     return this.model.create({
       ...input,
+      owner: user._id,
       createdAt: Date.now(),
       updatedAt: Date.now()
     })
   }
 
-  findAll() {
-    return `This action returns all projects`
+  async findAll(filter: FilterQuery<ProjectDocument>, options: FilterOffet) {
+    return this.model
+      .find(filter)
+      .sort({ [options.sort]: -1 })
+      .skip(options.offset)
+      .limit(options.limit)
   }
 
   async findOne(filter: FilterQuery<ProjectDocument>) {

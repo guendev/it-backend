@@ -13,10 +13,12 @@ import { CategoriesModule } from '@app/categories/categories.module'
 import { UploadModule } from '@app/upload/upload.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
-import { TechnologiesModule } from './app/technologies/technologies.module'
-import { ProjectsModule } from './app/projects/projects.module'
-import { StepModule } from './app/step/step.module'
-import { RolesModule } from './app/roles/roles.module'
+import { TechnologiesModule } from '@app/technologies/technologies.module'
+import { ProjectsModule } from '@app/projects/projects.module'
+import { StepModule } from '@app/step/step.module'
+import { RolesModule } from '@app/roles/roles.module'
+import { BookmarksModule } from './app/bookmarks/bookmarks.module';
+import { CommentsModule } from './app/comments/comments.module';
 
 @Module({
   imports: [
@@ -37,7 +39,9 @@ import { RolesModule } from './app/roles/roles.module'
     TechnologiesModule,
     ProjectsModule,
     StepModule,
-    RolesModule
+    RolesModule,
+    BookmarksModule,
+    CommentsModule
   ],
   controllers: [AppController],
   providers: [AppService, FirebaseAuthStrategy]

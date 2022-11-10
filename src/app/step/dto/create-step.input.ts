@@ -1,5 +1,5 @@
 import { InputType, Field, ID } from '@nestjs/graphql'
-import { StepStatus } from '@app/step/enums/project.status.enum'
+import { StepStatus } from '@app/step/enums/step.status.enum'
 import { IsNotEmpty, IsOptional, MinLength } from 'class-validator'
 import { IsObjectID } from '@shared/validator/objectid.validator'
 import { Types } from 'mongoose'

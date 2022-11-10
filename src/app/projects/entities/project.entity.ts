@@ -11,6 +11,9 @@ import {
 } from '@app/technologies/entities/technology.entity'
 import { Step, StepDocument } from '@app/step/entities/step.entity'
 import { Role, RoleDocument } from '@app/roles/entities/role.entity'
+import { ProjectStatus } from '@app/projects/enums/project.status.enum'
+import { ProjectActive } from '@app/projects/enums/project.active.enum'
+import { User, UserDocument } from '@app/users/entities/user.entity'
 
 export type ProjectDocument = Project & Document
 
@@ -36,8 +39,13 @@ export class Project {
   covers: string[]
 
   @Field()
-  @Prop({ slug: 'name', unique: true })
+  @Prop({ slug: 'name', unique: true, index: true })
   slug: string
+
+  // Chủ sở hữu
+  @Field(() => User)
+  @Prop({ type: Types.ObjectId, index: true, required: true })
+  owner: UserDocument
 
   @Field({ nullable: true, defaultValue: '' })
   @Prop({ default: '' })
@@ -74,12 +82,40 @@ export class Project {
   @Prop({ type: Number, index: true })
   updatedAt: number
 
+  // Dự án đang chạy hay là chuẩn bị
+  @Prop({
+    index: true,
+    default: ProjectStatus.PREPARE,
+    type: Number,
+    enum: ProjectStatus
+  })
+  @Field(() => ProjectStatus, { defaultValue: ProjectStatus.PREPARE })
+  status: ProjectStatus
+
+  // Dự án đang chạy hay là chuẩn bị
+  @Prop({
+    index: true,
+    default: ProjectActive.DISABLED,
+    type: Number,
+    enum: ProjectActive
+  })
+  @Field(() => ProjectActive, { defaultValue: ProjectActive.DISABLED })
+  active: ProjectActive
+
+  // Graphql
+  @Field(() => Float, { defaultValue: 0 })
+  bookmarks: number
+
+  // Graphql
+  @Field(() => Float, { defaultValue: 0 })
+  comments: number
+
   // GraphQL
-  @Field(() => [Step])
+  @Field(() => [Step], { defaultValue: [] })
   steps: StepDocument[]
 
   // GraphQL
-  @Field(() => [Role])
+  @Field(() => [Role], { defaultValue: [] })
   roles: RoleDocument[]
 }
 
