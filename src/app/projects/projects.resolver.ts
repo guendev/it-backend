@@ -130,6 +130,17 @@ export class ProjectsResolver {
   }
 
   @ResolveField()
+  async technologies(@Parent() author: Project) {
+    return this.technologiesService.find({
+      _id: {
+        $in: author.technologies.map(
+          (id) => new Types.ObjectId(id as unknown as string)
+        )
+      }
+    })
+  }
+
+  @ResolveField()
   async steps(@Parent() author: Project) {
     return this.stepsService.findMany({
       project: new Types.ObjectId(author.id)
@@ -168,7 +179,7 @@ export class ProjectsResolver {
   }
 
   async getTechs(_ids: (string | Types.ObjectId)[]) {
-    return this.technologiesService.findMany({
+    return this.technologiesService.find({
       _id: {
         $in: _ids.map((id) => new Types.ObjectId(id))
       }
