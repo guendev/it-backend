@@ -1,8 +1,9 @@
 import { registerEnumType } from '@nestjs/graphql'
 
 export enum ProjectActive {
-  DISABLED,
-  ACTIVE
+  DRAFT,
+  ACTIVE,
+  DISABLED
 }
 
 registerEnumType(ProjectActive, {

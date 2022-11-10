@@ -30,21 +30,20 @@ export class Project {
   @Field(() => ID)
   id: string
 
+  // Thông tin bắt buộc
   @Field()
   @Prop({ required: true, trim: true })
   name: string
 
-  @Field(() => String)
-  @Prop({ type: String })
-  cover: string
-
-  @Field(() => String)
-  @Prop({ type: String })
-  logo: string
-
+  // Sinh tự động từ nam
   @Field()
   @Prop({ slug: 'name', unique: true, index: true })
   slug: string
+
+  // Ảnh đại diện
+  @Field(() => String)
+  @Prop({ type: String })
+  cover: string
 
   // Chủ sở hữu
   @Field(() => User)
@@ -61,7 +60,7 @@ export class Project {
     index: true
   })
   @Field(() => Category)
-  category: CategoryDocument | Types.ObjectId
+  category: CategoryDocument
 
   @Prop({
     type: [Types.ObjectId],
@@ -70,13 +69,22 @@ export class Project {
   @Field(() => [Technology])
   technologies: TechnologyDocument[]
 
-  @Field(() => [String])
-  @Prop({ type: [String] })
-  files: string[]
-
   @Field(() => [Float, Float])
   @Prop({ type: [Number, Number], index: true })
   estimate: [number, number]
+
+  // Thông tin tuỳ chọn
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  @Prop({ type: String })
+  logo: string
+
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  @Prop({ type: String })
+  link: string
+
+  @Field(() => [String])
+  @Prop({ type: [String] })
+  files: string[]
 
   @Field(() => Float)
   @Prop({ type: Number, index: true })
@@ -96,14 +104,14 @@ export class Project {
   @Field(() => ProjectStatus, { defaultValue: ProjectStatus.PREPARE })
   status: ProjectStatus
 
-  // Dự án đang chạy hay là chuẩn bị
+  // Dự án đang hoạt động hay không
   @Prop({
     index: true,
-    default: ProjectActive.DISABLED,
+    default: ProjectActive.DRAFT,
     type: Number,
     enum: ProjectActive
   })
-  @Field(() => ProjectActive, { defaultValue: ProjectActive.DISABLED })
+  @Field(() => ProjectActive, { defaultValue: ProjectActive.DRAFT })
   active: ProjectActive
 
   // Graphql

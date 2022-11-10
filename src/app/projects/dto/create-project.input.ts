@@ -4,11 +4,13 @@ import {
   ArrayMinSize,
   IsArray,
   IsNotEmpty,
-  IsOptional, IsString,
+  IsOptional,
+  IsString,
   MinLength
-} from "class-validator";
+} from 'class-validator'
 import { Types } from 'mongoose'
 import { IsObjectID } from '@shared/validator/objectid.validator'
+import { ProjectStatus } from '@app/projects/enums/project.status.enum'
 
 @InputType()
 export class CreateProjectInput {
@@ -17,16 +19,14 @@ export class CreateProjectInput {
   @MinLength(3)
   name: string
 
-  @Field(() => String, { nullable: true })
-  logo: string
-
   @Field(() => String)
   @IsString()
   @IsNotEmpty()
   cover: string
 
-  @Field(() => String)
-  @IsNotEmpty()
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  @IsOptional()
+  @IsString()
   content: string
 
   @Field(() => ID)
@@ -34,11 +34,27 @@ export class CreateProjectInput {
   @IsObjectID()
   category: Types.ObjectId
 
-  @Field(() => [ID])
+  @Field(() => [ID], { nullable: true, defaultValue: [] })
   @IsArray()
   @ArrayMinSize(1)
   @IsObjectID({ each: true })
   technologies: Types.ObjectId[]
+
+  @Field(() => [Float, Float])
+  @IsArray()
+  @ArrayMinSize(2)
+  @ArrayMaxSize(2)
+  estimate: [number, number]
+
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  @IsOptional()
+  @IsString()
+  logo: string
+
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  @IsOptional()
+  @IsString()
+  link: string
 
   @Field(() => [ID], { defaultValue: [] })
   @IsOptional()
@@ -46,9 +62,9 @@ export class CreateProjectInput {
   @ArrayMinSize(0)
   files: string[]
 
-  @Field(() => [Float, Float])
-  @IsArray()
-  @ArrayMinSize(2)
-  @ArrayMaxSize(2)
-  estimate: [number, number]
+  @Field(() => ProjectStatus, {
+    defaultValue: ProjectStatus.PREPARE,
+    nullable: true
+  })
+  status: ProjectStatus
 }
