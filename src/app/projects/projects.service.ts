@@ -22,7 +22,7 @@ export class ProjectsService {
     })
   }
 
-  async findAll(filter: FilterQuery<ProjectDocument>, options: FilterOffet) {
+  async find(filter: FilterQuery<ProjectDocument>, options: FilterOffet) {
     return this.model
       .find(filter)
       .sort({ [options.sort]: -1 })

@@ -17,6 +17,7 @@ import { ProjectsModule } from '@app/projects/projects.module'
     ]),
     forwardRef(() => ProjectsModule)
   ],
-  providers: [RolesResolver, RolesService]
+  providers: [RolesResolver, RolesService],
+  exports: [RolesService]
 })
 export class RolesModule {}

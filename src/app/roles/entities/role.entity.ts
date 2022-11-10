@@ -3,6 +3,7 @@ import { Document, Types } from 'mongoose'
 import { Field, Float, ID, ObjectType } from '@nestjs/graphql'
 import { Project, ProjectDocument } from '@app/projects/entities/project.entity'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
+import { User, UserDocument } from "@app/users/entities/user.entity";
 
 export type RoleDocument = Role & Document
 
@@ -40,6 +41,11 @@ export class Role {
   })
   @Field(() => Project)
   project: ProjectDocument | Types.ObjectId
+
+  // Người được phân quyền
+  @Field(() => User, { nullable: true })
+  @Prop({ type: Types.ObjectId, index: true })
+  user: UserDocument
 
   @Field(() => Float)
   @Prop({ type: Number, index: true })

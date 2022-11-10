@@ -38,6 +38,11 @@ directive @connection(
   filter: [String!]
 ) on FIELD
 
+type Bookmark {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 type Category {
   content: String
   id: ID!
@@ -45,17 +50,33 @@ type Category {
   slug: String!
 }
 
+type Comment {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateBookmarkInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 input CreateCategoryInput {
   content: String = ""
   name: String!
 }
 
+input CreateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 input CreateProjectInput {
   category: ID!
   content: String!
-  covers: [String!]!
+  cover: String!
   estimate: [Float!]!
   files: [ID!] = []
+  logo: String
   name: String!
   technologies: [ID!]!
 }
@@ -102,18 +123,24 @@ input GetRolesInput {
 }
 
 type Mutation {
+  createBookmark(createBookmarkInput: CreateBookmarkInput!): Bookmark!
   createCategory(input: CreateCategoryInput!): Category!
+  createComment(createCommentInput: CreateCommentInput!): Comment!
   createProject(input: CreateProjectInput!): Project!
   createRole(input: CreateRoleInput!): Role!
   createStep(input: CreateStepInput!): Step!
   createTechnology(input: CreateTechnologyInput!): Technology!
+  removeBookmark(id: Int!): Bookmark!
   removeCategory(input: DeleteCategoryInput!): Category!
+  removeComment(id: Int!): Comment!
   removeProject(input: RemoveProjectInput!): Project!
   removeRole(input: RemoveRoleInput!): Role!
   removeStep(input: RemoveStepInput!): Step!
   removeTechnology(input: RemoveTechnologyInput!): Technology!
   sortRoles(input: SortRolesInput!): [Role!]!
+  updateBookmark(updateBookmarkInput: UpdateBookmarkInput!): Bookmark!
   updateCategory(input: UpdateCategoryInput!): Category!
+  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
   updateProject(input: UpdateProjectInput!): Project!
   updateRole(input: UpdateRoleInput!): Role!
   updateStep(input: UpdateStepInput!): Step!
@@ -147,11 +174,12 @@ type Project {
   category: Category!
   comments: Float!
   content: String
-  covers: [String!]!
+  cover: String!
   createdAt: Float!
   estimate: [Float!]!
   files: [String!]!
   id: ID!
+  logo: String!
   name: String!
   owner: User!
   roles: [Role!]!
@@ -175,8 +203,12 @@ enum ProjectStatus {
 }
 
 type Query {
+  bookmark(id: Int!): Bookmark!
+  bookmarks: [Bookmark!]!
   categories: [Category!]!
   category(category: String!): Category!
+  comment(id: Int!): Comment!
+  comments: [Comment!]!
   me: User!
   project(project: String!): Project!
   projects(filter: GetProjectsFilter!): [Project!]!
@@ -210,6 +242,7 @@ type Role {
   permissions: [PermissionEnum!]!
   project: Project!
   updatedAt: Float!
+  user: User
 }
 
 input SortRolesInput {
@@ -244,19 +277,32 @@ type Technology {
   slug: String!
 }
 
+input UpdateBookmarkInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
 input UpdateCategoryInput {
   content: String = ""
   id: ID!
   name: String
 }
 
+input UpdateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
 input UpdateProjectInput {
   category: ID
   content: String
-  covers: [String!]
+  cover: String
   estimate: [Float!]
   files: [ID!] = []
   id: ID!
+  logo: String
   name: String
   technologies: [ID!]
 }

@@ -4,9 +4,9 @@ import {
   ArrayMinSize,
   IsArray,
   IsNotEmpty,
-  IsOptional,
+  IsOptional, IsString,
   MinLength
-} from 'class-validator'
+} from "class-validator";
 import { Types } from 'mongoose'
 import { IsObjectID } from '@shared/validator/objectid.validator'
 
@@ -17,11 +17,13 @@ export class CreateProjectInput {
   @MinLength(3)
   name: string
 
-  @Field(() => [String])
+  @Field(() => String, { nullable: true })
+  logo: string
+
+  @Field(() => String)
+  @IsString()
   @IsNotEmpty()
-  @IsArray()
-  @ArrayMinSize(1)
-  covers: string[]
+  cover: string
 
   @Field(() => String)
   @IsNotEmpty()

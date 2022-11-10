@@ -34,9 +34,13 @@ export class Project {
   @Prop({ required: true, trim: true })
   name: string
 
-  @Field(() => [String])
-  @Prop({ type: [String] })
-  covers: string[]
+  @Field(() => String)
+  @Prop({ type: String })
+  cover: string
+
+  @Field(() => String)
+  @Prop({ type: String })
+  logo: string
 
   @Field()
   @Prop({ slug: 'name', unique: true, index: true })
@@ -57,7 +61,7 @@ export class Project {
     index: true
   })
   @Field(() => Category)
-  category: CategoryDocument
+  category: CategoryDocument | Types.ObjectId
 
   @Prop({
     type: [Types.ObjectId],

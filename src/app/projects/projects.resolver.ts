@@ -23,6 +23,8 @@ import { UseGuards } from '@nestjs/common'
 import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
 import { CurrentUser } from '@decorators/user.decorator'
 import { UsersService } from '@app/users/users.service'
+import { RolesService } from '@app/roles/roles.service'
+import { ProjectStatus } from '@app/projects/enums/project.status.enum'
 
 @Resolver(() => Project)
 export class ProjectsResolver {
@@ -31,7 +33,8 @@ export class ProjectsResolver {
     private readonly categoriesService: CategoriesService,
     private readonly technologiesService: TechnologiesService,
     private readonly stepsService: StepService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly rolesService: RolesService
   ) {}
 
   @Mutation(() => Project)
@@ -67,12 +70,18 @@ export class ProjectsResolver {
     if (filter.name) {
       _filter.name = { $regex: filter.name, $options: 'i' }
     }
-    if (filter.status) {
+    if (
+      [
+        ProjectStatus.PREPARE,
+        ProjectStatus.DONE,
+        ProjectStatus.RUNNING,
+        ProjectStatus.STUCK
+      ].includes(filter.status)
+    ) {
       _filter.status = filter.status
     }
-
     _filter.active = ProjectActive.ACTIVE
-    return this.projectsService.findAll(_filter, filter)
+    return this.projectsService.find(_filter, filter)
   }
 
   @Query(() => Project, { name: 'project' })
@@ -114,6 +123,13 @@ export class ProjectsResolver {
 
   // Graphql field resolver
   @ResolveField()
+  async category(@Parent() author: Project) {
+    return this.categoriesService.findOne({
+      _id: new Types.ObjectId(author.category as unknown as string)
+    })
+  }
+
+  @ResolveField()
   async steps(@Parent() author: Project) {
     return this.stepsService.findMany({
       project: new Types.ObjectId(author.id)
@@ -122,7 +138,7 @@ export class ProjectsResolver {
 
   @ResolveField()
   async roles(@Parent() author: Project) {
-    return this.stepsService.findMany({
+    return this.rolesService.find({
       project: new Types.ObjectId(author.id)
     })
   }
