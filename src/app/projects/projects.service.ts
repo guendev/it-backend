@@ -34,6 +34,12 @@ export class ProjectsService {
     return this.model.findOne(filter)
   }
 
+  async example(filter: FilterQuery<ProjectDocument>, size: number) {
+    return this.model
+      .aggregate([{ $match: filter }, { $sample: { size } }])
+      .addFields({ id: { $toString: '$_id' } })
+  }
+
   async update(project: ProjectDocument, doc: UpdateProjectInput) {
     return this.model.findByIdAndUpdate(
       project._id,

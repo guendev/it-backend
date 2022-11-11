@@ -25,6 +25,7 @@ import { CurrentUser } from '@decorators/user.decorator'
 import { UsersService } from '@app/users/users.service'
 import { RolesService } from '@app/roles/roles.service'
 import { ProjectStatus } from '@app/projects/enums/project.status.enum'
+import { ExampleProjectsFilter } from '@app/projects/filters/example-projects.filter'
 
 @Resolver(() => Project)
 export class ProjectsResolver {
@@ -58,30 +59,24 @@ export class ProjectsResolver {
 
   @Query(() => [Project], { name: 'projects' })
   async find(@Args('filter', new InputValidator()) filter: GetProjectsFilter) {
-    const _filter: FilterQuery<ProjectDocument> = {}
-    if (filter.category) {
-      _filter.category = new Types.ObjectId(filter.category)
-    }
-    if (filter.technologies && filter.technologies.length) {
-      _filter.technologies = {
-        $in: filter.technologies.map((id) => new Types.ObjectId(id))
-      }
-    }
-    if (filter.name) {
-      _filter.name = { $regex: filter.name, $options: 'i' }
-    }
-    if (
-      [
-        ProjectStatus.PREPARE,
-        ProjectStatus.DONE,
-        ProjectStatus.RUNNING,
-        ProjectStatus.STUCK
-      ].includes(filter.status)
-    ) {
-      _filter.status = filter.status
-    }
+    const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
     _filter.active = ProjectActive.ACTIVE
     return this.projectsService.find(_filter, filter)
+  }
+
+  @Query(() => [Project])
+  async exampleProjects(
+    @Args('filter', new InputValidator()) filter: ExampleProjectsFilter
+  ) {
+    const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
+    const _match: FilterQuery<ProjectDocument> = {
+      active: ProjectActive.ACTIVE
+    }
+    if (_filter.length > 0) {
+      _match.$or = [...Object.values(_filter)]
+    }
+    _match._id = { $nin: filter.exclude.map((id) => new Types.ObjectId(id)) }
+    return this.projectsService.example(_match, filter.limit)
   }
 
   @Query(() => Project, { name: 'project' })
@@ -184,5 +179,33 @@ export class ProjectsResolver {
         $in: _ids.map((id) => new Types.ObjectId(id))
       }
     })
+  }
+
+  getBasicFilter(
+    filter: Omit<GetProjectsFilter, 'sort' | 'limit' | 'offset'>
+  ): FilterQuery<ProjectDocument> {
+    const _filter: FilterQuery<ProjectDocument> = {}
+    if (filter.category) {
+      _filter.category = new Types.ObjectId(filter.category)
+    }
+    if (filter.technologies && filter.technologies.length) {
+      _filter.technologies = {
+        $in: filter.technologies.map((id) => new Types.ObjectId(id))
+      }
+    }
+    if (filter.name) {
+      _filter.name = { $regex: filter.name, $options: 'i' }
+    }
+    if (
+      [
+        ProjectStatus.PREPARE,
+        ProjectStatus.DONE,
+        ProjectStatus.RUNNING,
+        ProjectStatus.STUCK
+      ].includes(filter.status)
+    ) {
+      _filter.status = filter.status
+    }
+    return _filter
   }
 }

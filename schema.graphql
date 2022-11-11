@@ -108,6 +108,15 @@ input DeleteCategoryInput {
   id: ID!
 }
 
+input ExampleProjectsFilter {
+  category: ID
+  exclude: [ID!] = []
+  limit: Int!
+  name: String
+  status: ProjectStatus
+  technologies: [ID!]
+}
+
 input GetProjectsFilter {
   category: ID
   limit: Int!
@@ -213,6 +222,7 @@ type Query {
   category(category: String!): Category!
   comment(id: Int!): Comment!
   comments: [Comment!]!
+  exampleProjects(filter: ExampleProjectsFilter!): [Project!]!
   me: User!
   project(project: String!): Project!
   projects(filter: GetProjectsFilter!): [Project!]!
