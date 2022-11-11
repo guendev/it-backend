@@ -8,6 +8,8 @@ import { ProjectsService } from '@app/projects/projects.service'
 import { Types } from 'mongoose'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { RemoveStepInput } from '@app/step/dto/remove-step.input'
+import { UseGuards } from '@nestjs/common'
+import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
 
 @Resolver(() => Step)
 export class StepResolver {
@@ -17,9 +19,11 @@ export class StepResolver {
   ) {}
 
   @Mutation(() => Step)
+  @UseGuards(FirebaseAuthGuard)
   async createStep(
     @Args('input', new InputValidator()) input: CreateStepInput
   ) {
+    // Todo: check permission
     const _project = await this.projectService.findOne({
       _id: new Types.ObjectId(input.project)
     })
