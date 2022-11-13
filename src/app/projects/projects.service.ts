@@ -30,6 +30,10 @@ export class ProjectsService {
       .limit(options.limit)
   }
 
+  async count(filter: FilterQuery<ProjectDocument>) {
+    return this.model.countDocuments(filter)
+  }
+
   async findOne(filter: FilterQuery<ProjectDocument>) {
     return this.model.findOne(filter)
   }

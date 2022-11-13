@@ -55,6 +55,13 @@ type Comment {
   exampleField: Int!
 }
 
+input CountProjectsFilter {
+  category: ID
+  name: String
+  status: ProjectStatus
+  technologies: [ID!]
+}
+
 input CreateBookmarkInput {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -228,6 +235,8 @@ type Query {
   projects(filter: GetProjectsFilter!): [Project!]!
   roles(filter: GetRolesInput!): [Role!]!
   steps(input: UpdateStepInput!): [Step!]!
+  studioProjects(filter: GetProjectsFilter!): [Project!]!
+  studioProjectsCount(filter: CountProjectsFilter!): Int!
   technologies: [Technology!]!
   technology(id: Int!): Technology!
 }

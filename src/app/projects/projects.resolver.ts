@@ -1,6 +1,7 @@
 import { FilterQuery, Types } from 'mongoose'
 import {
   Args,
+  Int,
   Mutation,
   Parent,
   Query,
@@ -26,6 +27,7 @@ import { UsersService } from '@app/users/users.service'
 import { RolesService } from '@app/roles/roles.service'
 import { ProjectStatus } from '@app/projects/enums/project.status.enum'
 import { ExampleProjectsFilter } from '@app/projects/filters/example-projects.filter'
+import { CountProjectsFilter } from '@app/projects/filters/count-projects.filter'
 
 @Resolver(() => Project)
 export class ProjectsResolver {
@@ -44,8 +46,6 @@ export class ProjectsResolver {
     @Args('input', new InputValidator()) input: CreateProjectInput,
     @CurrentUser() user
   ) {
-    console.log(user)
-
     const [category, technologies] = await Promise.all([
       this.getCategory(input.category),
       this.getTechs(input.technologies)
@@ -162,6 +162,31 @@ export class ProjectsResolver {
   @ResolveField()
   async comments(@Parent() author: Project) {
     return 0
+  }
+
+  // Studio
+  @Query(() => [Project])
+  @UseGuards(FirebaseAuthGuard)
+  async studioProjects(
+    @Args('filter', new InputValidator()) filter: GetProjectsFilter,
+    @CurrentUser() user
+  ) {
+    // Todo: check admin, permission
+    const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
+    _filter.owner = user._id
+    return this.projectsService.find(_filter, filter)
+  }
+
+  @Query(() => Int)
+  @UseGuards(FirebaseAuthGuard)
+  async studioProjectsCount(
+    @Args('filter', new InputValidator()) filter: CountProjectsFilter,
+    @CurrentUser() user
+  ) {
+    // Todo: check admin, permission
+    const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
+    _filter.owner = user._id
+    return this.projectsService.count(_filter)
   }
 
   // Helper
