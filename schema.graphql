@@ -359,8 +359,6 @@ type User {
 }
 
 enum UserRole {
-  ADMIN
-  AUTHOR
   SP_ADMIN
   USER
 }
