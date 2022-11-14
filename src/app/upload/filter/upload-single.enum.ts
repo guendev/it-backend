@@ -1,4 +1,5 @@
 export enum UploadSingleEnum {
   project = 'project',
-  category = 'category'
+  category = 'category',
+  logo = 'logo'
 }

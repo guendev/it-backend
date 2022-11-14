@@ -124,6 +124,10 @@ input ExampleProjectsFilter {
   technologies: [ID!]
 }
 
+input GetProjectFilter {
+  id: ID!
+}
+
 input GetProjectsFilter {
   category: ID
   limit: Int!
@@ -138,6 +142,12 @@ input GetProjectsFilter {
 
 input GetRolesInput {
   project: ID!
+}
+
+input GetTechnologiesFilter {
+  limit: Int!
+  name: String
+  offset: Int!
 }
 
 type Mutation {
@@ -235,9 +245,10 @@ type Query {
   projects(filter: GetProjectsFilter!): [Project!]!
   roles(filter: GetRolesInput!): [Role!]!
   steps(input: UpdateStepInput!): [Step!]!
+  studioProject(filter: GetProjectFilter!): Project!
   studioProjects(filter: GetProjectsFilter!): [Project!]!
   studioProjectsCount(filter: CountProjectsFilter!): Int!
-  technologies: [Technology!]!
+  technologies(filter: GetTechnologiesFilter!): [Technology!]!
   technology(id: Int!): Technology!
 }
 

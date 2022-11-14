@@ -1,11 +1,13 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql'
 import { TechnologiesService } from './technologies.service'
-import { Technology } from './entities/technology.entity'
+import { Technology, TechnologyDocument } from './entities/technology.entity'
 import { CreateTechnologyInput } from './dto/create-technology.input'
 import { UpdateTechnologyInput } from './dto/update-technology.input'
 import { InputValidator } from '@shared/validator/input.validator'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { RemoveTechnologyInput } from '@app/technologies/dto/remove-technology.input'
+import { GetTechnologiesFilter } from '@app/technologies/filters/get-technologies.filter'
+import { FilterQuery } from 'mongoose'
 
 @Resolver(() => Technology)
 export class TechnologiesResolver {
@@ -20,8 +22,14 @@ export class TechnologiesResolver {
   }
 
   @Query(() => [Technology], { name: 'technologies' })
-  async findMany() {
-    return this.technologiesService.findAll({})
+  async findMany(
+    @Args('filter', new InputValidator()) filter: GetTechnologiesFilter
+  ) {
+    const _filter: FilterQuery<TechnologyDocument> = {}
+    if (filter.name) {
+      _filter.name = { $regex: filter.name, $options: 'i' }
+    }
+    return this.technologiesService.find(_filter, filter)
   }
 
   @Query(() => Technology, { name: 'technology' })

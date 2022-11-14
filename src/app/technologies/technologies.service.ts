@@ -6,6 +6,7 @@ import {
   TechnologyDocument
 } from '@app/technologies/entities/technology.entity'
 import { CreateTechnologyInput } from '@app/technologies/dto/create-technology.input'
+import { FilterOffet } from '@shared/args/filter-offset.input'
 
 @Injectable()
 export class TechnologiesService {
@@ -17,11 +18,20 @@ export class TechnologiesService {
     return this.model.create(doc)
   }
 
-  async findAll(filter: FilterQuery<TechnologyDocument>) {
-    return this.model.find(filter)
-  }
+  async find(filter: FilterQuery<TechnologyDocument>)
 
-  async find(filter: FilterQuery<TechnologyDocument>) {
+  async find(
+    filter: FilterQuery<TechnologyDocument>,
+    option: Omit<FilterOffet, 'sort'>
+  )
+
+  async find(
+    filter: FilterQuery<TechnologyDocument>,
+    option?: Omit<FilterOffet, 'sort'>
+  ) {
+    if (option) {
+      return this.model.find(filter).skip(option.offset).limit(option.limit)
+    }
     return this.model.find(filter)
   }
 

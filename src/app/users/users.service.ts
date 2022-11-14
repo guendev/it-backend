@@ -7,6 +7,7 @@ import { app, auth } from 'firebase-admin'
 import App = app.App
 import * as firebase from 'firebase-admin'
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier'
+import { FilterOffet } from '@shared/args/filter-offset.input'
 
 const firebase_params = {
   type: firebaseConfig.type,
@@ -39,6 +40,21 @@ export class UsersService {
       uid: user.uid,
       createdAt: Date.now()
     })
+  }
+
+  async find(filter: FilterQuery<UserDocument>)
+
+  async find(filter: FilterQuery<UserDocument>, options: FilterOffet)
+
+  async find(filter: FilterQuery<UserDocument>, options?: FilterOffet) {
+    if (options) {
+      return this.userModel
+        .find(filter)
+        .sort({ [options.sort]: -1 })
+        .skip(options.offset)
+        .limit(options.limit)
+    }
+    return this.userModel.find(filter)
   }
 
   async findOne(filter: FilterQuery<UserDocument>) {

@@ -28,6 +28,7 @@ import { RolesService } from '@app/roles/roles.service'
 import { ProjectStatus } from '@app/projects/enums/project.status.enum'
 import { ExampleProjectsFilter } from '@app/projects/filters/example-projects.filter'
 import { CountProjectsFilter } from '@app/projects/filters/count-projects.filter'
+import { GetProjectFilter } from '@app/projects/filters/get-project.filter'
 
 @Resolver(() => Project)
 export class ProjectsResolver {
@@ -175,6 +176,18 @@ export class ProjectsResolver {
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
     _filter.owner = user._id
     return this.projectsService.find(_filter, filter)
+  }
+
+  @Query(() => Project)
+  @UseGuards(FirebaseAuthGuard)
+  async studioProject(
+    @Args('filter', new InputValidator()) filter: GetProjectFilter,
+    @CurrentUser() user
+  ) {
+    // Todo: check admin, permission
+    const _filter: FilterQuery<ProjectDocument> = {}
+    _filter.owner = user._id
+    return this.projectsService.findOne(_filter)
   }
 
   @Query(() => Int)

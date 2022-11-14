@@ -8,11 +8,7 @@ export enum PermissionEnum {
   // Role
   CREATE_ROLE,
   UPDATE_ROLE,
-  REMOVE_ROLE,
-
-  // Member
-  ACCEPT_MEMBER,
-  REMOVE_MEMBER
+  REMOVE_ROLE
 }
 
 registerEnumType(PermissionEnum, {

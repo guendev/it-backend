@@ -18,6 +18,12 @@ export const UploadSizeBuilder = (endpoint: UploadSingleEnum): IUploadSize => {
         width: 100,
         height: 100
       }
+      break
+    case UploadSingleEnum.logo:
+      size = {
+        width: 100,
+        height: 100
+      }
   }
   return size
 }
