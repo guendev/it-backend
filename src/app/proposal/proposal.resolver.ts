@@ -9,6 +9,7 @@ import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
 import { RolesService } from '@app/roles/roles.service'
 import { Types } from 'mongoose'
 import { NotFoundError } from '@shared/errors/not-found.error'
+import { GetProposalsFilter } from '@app/proposal/filters/get-proposals.filter'
 
 @Resolver(() => Proposal)
 export class ProposalResolver {
@@ -37,7 +38,8 @@ export class ProposalResolver {
   }
 
   @Query(() => [Proposal], { name: 'proposal' })
-  findAll() {
+  async find(@Args('filter', new InputValidator()) filter: GetProposalsFilter) {
+    console.log(filter)
     return this.proposalService.findAll()
   }
 
