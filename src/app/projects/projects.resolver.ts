@@ -30,8 +30,12 @@ import { UsersService } from '@app/users/users.service'
 import { RolesService } from '@app/roles/roles.service'
 import { ProjectStatus } from '@app/projects/enums/project.status.enum'
 import { ExampleProjectsFilter } from '@app/projects/filters/example-projects.filter'
-import { CountProjectsFilter } from '@app/projects/filters/count-projects.filter'
+import {
+  CountProjectsFilter,
+  StudioCountProjectsFilter
+} from '@app/projects/filters/count-projects.filter'
 import { GetProjectFilter } from '@app/projects/filters/get-project.filter'
+import { ApproveProjectInput } from '@app/projects/dto/approve-project.input'
 
 @Resolver(() => Project)
 export class ProjectsResolver {
@@ -200,13 +204,23 @@ export class ProjectsResolver {
   @Query(() => Int)
   @UseGuards(FirebaseAuthGuard)
   async studioProjectsCount(
-    @Args('filter', new InputValidator()) filter: CountProjectsFilter,
+    @Args('filter', new InputValidator()) filter: StudioCountProjectsFilter,
     @CurrentUser() user
   ) {
     // Todo: check admin, permission
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
     _filter.owner = user._id
+    if (filter.active.length) {
+      _filter.active = { $in: filter.active }
+    }
     return this.projectsService.count(_filter)
+  }
+
+  @Mutation(() => Project)
+  async studioProjectApprove(
+    @Args('input', new InputValidator()) filter: ApproveProjectInput
+  ) {
+    console.log(filter)
   }
 
   // Helper

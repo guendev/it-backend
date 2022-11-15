@@ -2,6 +2,8 @@ import { InputType, Field, ID } from '@nestjs/graphql'
 import { IsArray, IsOptional } from 'class-validator'
 import { IsObjectID } from '@shared/validator/objectid.validator'
 import { ProjectStatus } from '@app/projects/enums/project.status.enum'
+import { ProjectActive } from '@app/projects/enums/project.active.enum'
+import { GetProjectsFilter } from '@app/projects/filters/get-projects.filter'
 
 @InputType()
 export class CountProjectsFilter {
@@ -23,4 +25,11 @@ export class CountProjectsFilter {
   @Field(() => ProjectStatus, { nullable: true })
   @IsOptional()
   status?: ProjectStatus
+}
+
+@InputType()
+export class StudioCountProjectsFilter extends CountProjectsFilter {
+  @Field(() => [ProjectActive], { nullable: true, defaultValue: [] })
+  @IsOptional()
+  active: ProjectActive[]
 }

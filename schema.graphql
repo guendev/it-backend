@@ -55,13 +55,6 @@ type Comment {
   exampleField: Int!
 }
 
-input CountProjectsFilter {
-  category: ID
-  name: String
-  status: ProjectStatus
-  technologies: [ID!]
-}
-
 input CreateBookmarkInput {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -273,7 +266,7 @@ type Query {
   steps(filter: GetStepsFilter!): [Step!]!
   studioProject(filter: GetProjectFilter!): Project!
   studioProjects(filter: GetMyProjectsFilter!): [Project!]!
-  studioProjectsCount(filter: CountProjectsFilter!): Int!
+  studioProjectsCount(filter: StudioCountProjectsFilter!): Int!
   technologies(filter: GetTechnologiesFilter!): [Technology!]!
   technology(id: Int!): Technology!
   users(filter: GetUsersFilter!): [User!]!
@@ -328,6 +321,14 @@ type Step {
 enum StepStatus {
   DONE
   WAITING
+}
+
+input StudioCountProjectsFilter {
+  active: [ProjectActive!] = []
+  category: ID
+  name: String
+  status: ProjectStatus
+  technologies: [ID!]
 }
 
 type Subscription {
