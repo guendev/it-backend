@@ -30,10 +30,7 @@ import { UsersService } from '@app/users/users.service'
 import { RolesService } from '@app/roles/roles.service'
 import { ProjectStatus } from '@app/projects/enums/project.status.enum'
 import { ExampleProjectsFilter } from '@app/projects/filters/example-projects.filter'
-import {
-  CountProjectsFilter,
-  StudioCountProjectsFilter
-} from '@app/projects/filters/count-projects.filter'
+import { StudioCountProjectsFilter } from '@app/projects/filters/count-projects.filter'
 import { GetProjectFilter } from '@app/projects/filters/get-project.filter'
 import { ApproveProjectInput } from '@app/projects/dto/approve-project.input'
 
@@ -220,7 +217,13 @@ export class ProjectsResolver {
   async studioProjectApprove(
     @Args('input', new InputValidator()) filter: ApproveProjectInput
   ) {
-    console.log(filter)
+    const _project = await this.projectsService.findOne({
+      _id: new Types.ObjectId(filter.id)
+    })
+    if (!_project) throw new NotFoundError('Project not found')
+    return this.projectsService.update(_project, {
+      active: filter.active
+    })
   }
 
   // Helper

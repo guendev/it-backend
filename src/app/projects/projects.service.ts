@@ -44,7 +44,7 @@ export class ProjectsService {
       .addFields({ id: { $toString: '$_id' } })
   }
 
-  async update(project: ProjectDocument, doc: UpdateProjectInput) {
+  async update(project: ProjectDocument, doc: Partial<Omit<Project, 'id'>>) {
     return this.model.findByIdAndUpdate(
       project._id,
       {

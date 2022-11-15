@@ -67,14 +67,17 @@ export class RolesResolver {
   async updateRole(
     @Args('input', new InputValidator()) input: UpdateRoleInput
   ) {
+    /// dfd
     const _role = await this.rolesService.findOne({
       _id: new Types.ObjectId(input.id)
     })
     if (!_role) {
       throw new NotFoundError('Role không tồn tại')
     }
+    ///fdsfsd
     // Todo: check permission
     delete input.id
+    ///fdsfdsf
     return this.rolesService.update(_role, input)
   }
 

@@ -38,6 +38,11 @@ directive @connection(
   filter: [String!]
 ) on FIELD
 
+input ApproveProjectInput {
+  active: ProjectActive!
+  id: ID!
+}
+
 type Bookmark {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -81,6 +86,12 @@ input CreateProjectInput {
   name: String!
   status: ProjectStatus = PREPARE
   technologies: [ID!] = []
+}
+
+input CreateProposalInput {
+  letter: String
+  resume: String
+  role: ID!
 }
 
 input CreateRoleInput {
@@ -175,6 +186,7 @@ type Mutation {
   createCategory(input: CreateCategoryInput!): Category!
   createComment(createCommentInput: CreateCommentInput!): Comment!
   createProject(input: CreateProjectInput!): Project!
+  createProposal(input: CreateProposalInput!): Proposal!
   createRole(input: CreateRoleInput!): Role!
   createStep(input: CreateStepInput!): Step!
   createTechnology(input: CreateTechnologyInput!): Technology!
@@ -182,15 +194,18 @@ type Mutation {
   removeCategory(input: DeleteCategoryInput!): Category!
   removeComment(id: Int!): Comment!
   removeProject(input: RemoveProjectInput!): Project!
+  removeProposal(id: Int!): Proposal!
   removeRole(input: RemoveRoleInput!): Role!
   removeStep(input: RemoveStepInput!): Step!
   removeTechnology(input: RemoveTechnologyInput!): Technology!
   sortRoles(input: SortRolesInput!): [Role!]!
   sortSteps(input: SortStepsInput!): [Step!]!
+  studioProjectApprove(input: ApproveProjectInput!): Project!
   updateBookmark(updateBookmarkInput: UpdateBookmarkInput!): Bookmark!
   updateCategory(input: UpdateCategoryInput!): Category!
   updateComment(updateCommentInput: UpdateCommentInput!): Comment!
   updateProject(input: UpdateProjectInput!): Project!
+  updateProposal(updateProposalInput: UpdateProposalInput!): Proposal!
   updateRole(input: UpdateRoleInput!): Role!
   updateStep(input: UpdateStepInput!): Step!
   updateTechnology(input: UpdateTechnologyInput!): Technology!
@@ -251,6 +266,24 @@ enum ProjectStatus {
   STUCK
 }
 
+type Proposal {
+  createdAt: Float!
+  id: ID!
+  letter: String!
+  note: String!
+  resume: String!
+  role: Role!
+  status: ProposalEnum!
+  updatedAt: Float!
+  user: User
+}
+
+enum ProposalEnum {
+  APPROVED
+  REJECTED
+  WAITING
+}
+
 type Query {
   bookmark(id: Int!): Bookmark!
   bookmarks: [Bookmark!]!
@@ -262,6 +295,7 @@ type Query {
   me: User!
   project(project: String!): Project!
   projects(filter: GetProjectsFilter!): [Project!]!
+  proposal(id: Int!): Proposal!
   roles(filter: GetRolesInput!): [Role!]!
   steps(filter: GetStepsFilter!): [Step!]!
   studioProject(filter: GetProjectFilter!): Project!
@@ -373,6 +407,13 @@ input UpdateProjectInput {
   name: String
   status: ProjectStatus = PREPARE
   technologies: [ID!] = []
+}
+
+input UpdateProposalInput {
+  id: Int!
+  letter: String
+  resume: String
+  role: ID
 }
 
 input UpdateRoleInput {

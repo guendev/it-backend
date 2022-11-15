@@ -19,6 +19,7 @@ import { StepModule } from '@app/step/step.module'
 import { RolesModule } from '@app/roles/roles.module'
 import { BookmarksModule } from './app/bookmarks/bookmarks.module'
 import { CommentsModule } from './app/comments/comments.module'
+import { ProposalModule } from './app/proposal/proposal.module';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { CommentsModule } from './app/comments/comments.module'
     StepModule,
     RolesModule,
     BookmarksModule,
-    CommentsModule
+    CommentsModule,
+    ProposalModule
   ],
   controllers: [AppController],
   providers: [AppService, FirebaseAuthStrategy]
