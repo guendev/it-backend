@@ -17,8 +17,8 @@ import { TechnologiesModule } from '@app/technologies/technologies.module'
 import { ProjectsModule } from '@app/projects/projects.module'
 import { StepModule } from '@app/step/step.module'
 import { RolesModule } from '@app/roles/roles.module'
-import { BookmarksModule } from './app/bookmarks/bookmarks.module';
-import { CommentsModule } from './app/comments/comments.module';
+import { BookmarksModule } from './app/bookmarks/bookmarks.module'
+import { CommentsModule } from './app/comments/comments.module'
 
 @Module({
   imports: [

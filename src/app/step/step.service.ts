@@ -16,24 +16,19 @@ export class StepService {
     })
   }
 
-  async findAll(filter: FilterQuery<StepDocument>) {
-    return this.model.find(filter)
+  async find(filter: FilterQuery<StepDocument>): Promise<StepDocument[]> {
+    return this.model.find(filter).sort({
+      order: 1
+    })
   }
 
   async findOne(filter: FilterQuery<StepDocument>) {
     return this.model.findOne(filter)
   }
 
-  async findMany(filter: FilterQuery<StepDocument>) {
-    return this.model.find(filter).sort({ order: 1, _id: 1 })
-  }
-
-  async update(
-    match: FilterQuery<StepDocument>,
-    doc: Omit<UpdateStepInput, 'id'>
-  ) {
-    return this.model.findOneAndUpdate(
-      match,
+  async update(step: StepDocument, doc: Omit<UpdateStepInput, 'id'>) {
+    return this.model.findByIdAndUpdate(
+      step._id,
       {
         ...doc,
         updatedAt: Date.now()

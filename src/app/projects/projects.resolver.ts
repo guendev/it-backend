@@ -138,7 +138,7 @@ export class ProjectsResolver {
 
   @ResolveField()
   async steps(@Parent() author: Project) {
-    return this.stepsService.findMany({
+    return this.stepsService.find({
       project: new Types.ObjectId(author.id)
     })
   }
@@ -187,6 +187,7 @@ export class ProjectsResolver {
     // Todo: check admin, permission
     const _filter: FilterQuery<ProjectDocument> = {}
     _filter.owner = user._id
+    _filter._id = new Types.ObjectId(filter.id)
     return this.projectsService.findOne(_filter)
   }
 

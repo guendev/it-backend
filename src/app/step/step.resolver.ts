@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { StepService } from './step.service'
-import { Step } from './entities/step.entity'
+import { Step, StepDocument } from './entities/step.entity'
 import { CreateStepInput } from './dto/create-step.input'
 import { UpdateStepInput } from './dto/update-step.input'
 import { InputValidator } from '@shared/validator/input.validator'
@@ -10,12 +10,17 @@ import { NotFoundError } from '@shared/errors/not-found.error'
 import { RemoveStepInput } from '@app/step/dto/remove-step.input'
 import { UseGuards } from '@nestjs/common'
 import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
+import { GetStepsFilter } from '@app/step/filters/get-steps.filter'
+import { EventEmitter2 } from '@nestjs/event-emitter'
+import { SortStepsInput } from '@app/step/dto/sort-steps.input'
+import { StepStatus } from '@app/step/enums/step.status.enum'
 
 @Resolver(() => Step)
 export class StepResolver {
   constructor(
     private readonly stepService: StepService,
-    private readonly projectService: ProjectsService
+    private readonly projectService: ProjectsService,
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   @Mutation(() => Step)
@@ -31,7 +36,7 @@ export class StepResolver {
       throw new Error('Project not found')
     }
 
-    const _steps = await this.stepService.findMany({
+    const _steps = await this.stepService.find({
       project: new Types.ObjectId(input.project)
     })
     const _order = _steps.sort((a, b) => b.order - a.order)[0]?.order || 0
@@ -44,14 +49,16 @@ export class StepResolver {
   }
 
   @Query(() => [Step], { name: 'steps' })
-  async findAll(@Args('input', new InputValidator()) input: UpdateStepInput) {
+  async findAll(@Args('filter', new InputValidator()) filter: GetStepsFilter) {
     const _project = await this.projectService.findOne({
-      _id: new Types.ObjectId(input.project)
+      _id: new Types.ObjectId(filter.project)
     })
     if (!_project) {
       throw new Error('Project not found')
     }
-    return this.stepService.findAll({ project: _project._id })
+    return this.stepService.find({
+      project: _project._id
+    })
   }
 
   @Mutation(() => Step)
@@ -67,23 +74,60 @@ export class StepResolver {
     // Todo: check if project exists
     // Todo: check permission
     delete input.id
-    const _newRole = await this.stepService.update(input.id, input)
-    // Todo: event check lại các step khác
-    return _newRole
+    const _newStep = await this.stepService.update(_step, input)
+    // check ddieuef kien
+    if (_newStep.status !== _step.status) {
+      this.eventEmitter.emit('step.checked', {
+        anchor: _newStep
+      })
+    }
+
+    return _newStep
   }
 
-  // @Mutation(() => Step)
-  // async checkStep(@Args('input', new InputValidator()) input: CheckStepInput) {
-  //   // Todo: check auth, event, etc
-  //   const _step = await this.stepService.update(
-  //     { _id: new Types.ObjectId(input.id) },
-  //     { status: StepStatus.DONE }
-  //   )
-  //   if (!_step) {
-  //     throw new Error('Step not found')
-  //   }
-  //   return _step
-  // }
+  @Mutation(() => [Step])
+  async sortSteps(@Args('input', new InputValidator()) input: SortStepsInput) {
+    if (!input.steps.length) {
+      return []
+    }
+    // validate first step
+    const _first = input.steps[0]
+    const _firstStep = await this.stepService.findOne({
+      _id: new Types.ObjectId(_first)
+    })
+    if (!_firstStep) {
+      throw new NotFoundError('Step not found')
+    }
+    // Todo: Check permission
+    const _steps = await this.stepService.find({
+      project: _firstStep.project,
+      _id: { $in: input.steps.map((id) => new Types.ObjectId(id)) }
+    })
+    if (_steps.length !== input.steps.length) {
+      throw new Error('Some steps not found')
+    }
+    const newSteps = await Promise.all<StepDocument>(
+      input.steps.map(
+        (step, index) =>
+          new Promise((resolve, reject) => {
+            this.stepService
+              .update(
+                {
+                  _id: new Types.ObjectId(step)
+                } as StepDocument,
+                {
+                  status: StepStatus.WAITING,
+                  order: index + 1
+                } as any
+              )
+              .then(resolve)
+              .catch(reject)
+          })
+      )
+    )
+
+    return newSteps.sort((a, b) => a.order - b.order)
+  }
 
   @Mutation(() => Step)
   async removeStep(

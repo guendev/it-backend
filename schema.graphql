@@ -144,10 +144,24 @@ input GetRolesInput {
   project: ID!
 }
 
+input GetStepsFilter {
+  project: ID!
+}
+
 input GetTechnologiesFilter {
   limit: Int!
   name: String
   offset: Int!
+}
+
+input GetUsersFilter {
+  exclude: [ID!] = []
+  limit: Int!
+  name: String
+  offset: Int!
+
+  """Sắp xếp của bình luận"""
+  sort: String!
 }
 
 type Mutation {
@@ -166,6 +180,7 @@ type Mutation {
   removeStep(input: RemoveStepInput!): Step!
   removeTechnology(input: RemoveTechnologyInput!): Technology!
   sortRoles(input: SortRolesInput!): [Role!]!
+  sortSteps(input: SortStepsInput!): [Step!]!
   updateBookmark(updateBookmarkInput: UpdateBookmarkInput!): Bookmark!
   updateCategory(input: UpdateCategoryInput!): Category!
   updateComment(updateCommentInput: UpdateCommentInput!): Comment!
@@ -187,9 +202,7 @@ type Notify {
 }
 
 enum PermissionEnum {
-  ACCEPT_MEMBER
   CREATE_ROLE
-  REMOVE_MEMBER
   REMOVE_PROJECT
   REMOVE_ROLE
   UPDATE_PROJECT
@@ -244,12 +257,13 @@ type Query {
   project(project: String!): Project!
   projects(filter: GetProjectsFilter!): [Project!]!
   roles(filter: GetRolesInput!): [Role!]!
-  steps(input: UpdateStepInput!): [Step!]!
+  steps(filter: GetStepsFilter!): [Step!]!
   studioProject(filter: GetProjectFilter!): Project!
   studioProjects(filter: GetProjectsFilter!): [Project!]!
   studioProjectsCount(filter: CountProjectsFilter!): Int!
   technologies(filter: GetTechnologiesFilter!): [Technology!]!
   technology(id: Int!): Technology!
+  users(filter: GetUsersFilter!): [User!]!
 }
 
 input RemoveProjectInput {
@@ -280,6 +294,10 @@ type Role {
 }
 
 input SortRolesInput {
+  roles: [ID!]!
+}
+
+input SortStepsInput {
   roles: [ID!]!
 }
 
@@ -353,11 +371,10 @@ input UpdateRoleInput {
 }
 
 input UpdateStepInput {
-  content: String = ""
+  content: String
   id: ID!
   name: String
-  project: ID
-  status: StepStatus = WAITING
+  status: StepStatus
 }
 
 input UpdateTechnologyInput {

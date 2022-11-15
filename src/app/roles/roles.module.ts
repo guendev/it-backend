@@ -4,6 +4,7 @@ import { RolesResolver } from './roles.resolver'
 import { MongooseModule } from '@nestjs/mongoose'
 import { Role, RoleEntity } from '@app/roles/entities/role.entity'
 import { ProjectsModule } from '@app/projects/projects.module'
+import { RolesEvent } from '@app/roles/roles.event'
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { ProjectsModule } from '@app/projects/projects.module'
     ]),
     forwardRef(() => ProjectsModule)
   ],
-  providers: [RolesResolver, RolesService],
+  providers: [RolesResolver, RolesService, RolesEvent],
   exports: [RolesService]
 })
 export class RolesModule {}

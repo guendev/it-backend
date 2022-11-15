@@ -1,4 +1,11 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql'
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent
+} from '@nestjs/graphql'
 import { RolesService } from './roles.service'
 import { Role, RoleDocument } from './entities/role.entity'
 import { CreateRoleInput } from './dto/create-role.input'
@@ -10,12 +17,16 @@ import { NotFoundError } from '@shared/errors/not-found.error'
 import { SortRolesInput } from '@app/roles/dto/sort-roles.input'
 import { RemoveRoleInput } from '@app/roles/dto/remove-role.input'
 import { GetRolesInput } from '@app/roles/dto/get-roles.input'
+import { UsersService } from '@app/users/users.service'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Resolver(() => Role)
 export class RolesResolver {
   constructor(
     private readonly rolesService: RolesService,
-    private readonly projectsService: ProjectsService
+    private readonly usersService: UsersService,
+    private readonly projectsService: ProjectsService,
+    private eventEmitter: EventEmitter2
   ) {}
 
   @Mutation(() => Role)
@@ -111,5 +122,11 @@ export class RolesResolver {
     }
     // Todo: check permission
     return this.rolesService.remove(_role)
+  }
+
+  //
+  @ResolveField()
+  async user(@Parent() author: Role) {
+    return this.usersService.findOne({ _id: author.user })
   }
 }

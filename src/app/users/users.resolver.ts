@@ -25,6 +25,9 @@ export class UsersResolver {
     if (filter.name) {
       _filter.name = { $regex: filter.name, $options: 'i' }
     }
-    return this.usersService.find(filter, filter)
+    if (filter.exclude.length) {
+      _filter._id = { $nin: filter.exclude }
+    }
+    return this.usersService.find(_filter, filter)
   }
 }
