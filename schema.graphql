@@ -124,6 +124,19 @@ input ExampleProjectsFilter {
   technologies: [ID!]
 }
 
+input GetMyProjectsFilter {
+  active: [ProjectActive!] = []
+  category: ID
+  limit: Int!
+  name: String
+  offset: Int!
+
+  """Sắp xếp của bình luận"""
+  sort: String!
+  status: ProjectStatus
+  technologies: [ID!]
+}
+
 input GetProjectFilter {
   id: ID!
 }
@@ -259,7 +272,7 @@ type Query {
   roles(filter: GetRolesInput!): [Role!]!
   steps(filter: GetStepsFilter!): [Step!]!
   studioProject(filter: GetProjectFilter!): Project!
-  studioProjects(filter: GetProjectsFilter!): [Project!]!
+  studioProjects(filter: GetMyProjectsFilter!): [Project!]!
   studioProjectsCount(filter: CountProjectsFilter!): Int!
   technologies(filter: GetTechnologiesFilter!): [Technology!]!
   technology(id: Int!): Technology!
@@ -298,7 +311,7 @@ input SortRolesInput {
 }
 
 input SortStepsInput {
-  roles: [ID!]!
+  steps: [ID!]!
 }
 
 type Step {

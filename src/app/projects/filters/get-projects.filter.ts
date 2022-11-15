@@ -3,6 +3,7 @@ import { IsArray, IsOptional } from 'class-validator'
 import { FilterOffet } from '@shared/args/filter-offset.input'
 import { IsObjectID } from '@shared/validator/objectid.validator'
 import { ProjectStatus } from '@app/projects/enums/project.status.enum'
+import { ProjectActive } from '@app/projects/enums/project.active.enum'
 
 @InputType()
 export class GetProjectsFilter extends FilterOffet {
@@ -24,4 +25,11 @@ export class GetProjectsFilter extends FilterOffet {
   @Field(() => ProjectStatus, { nullable: true })
   @IsOptional()
   status?: ProjectStatus
+}
+
+@InputType()
+export class GetMyProjectsFilter extends GetProjectsFilter {
+  @Field(() => [ProjectActive], { nullable: true, defaultValue: [] })
+  @IsOptional()
+  active: ProjectActive[]
 }

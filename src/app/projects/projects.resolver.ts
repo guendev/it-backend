@@ -18,7 +18,10 @@ import { TechnologiesService } from '@app/technologies/technologies.service'
 import { StepService } from '@app/step/step.service'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { RemoveProjectInput } from '@app/projects/dto/remove-project.input'
-import { GetProjectsFilter } from '@app/projects/filters/get-projects.filter'
+import {
+  GetMyProjectsFilter,
+  GetProjectsFilter
+} from '@app/projects/filters/get-projects.filter'
 import { ProjectActive } from '@app/projects/enums/project.active.enum'
 import { UseGuards } from '@nestjs/common'
 import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
@@ -169,12 +172,15 @@ export class ProjectsResolver {
   @Query(() => [Project])
   @UseGuards(FirebaseAuthGuard)
   async studioProjects(
-    @Args('filter', new InputValidator()) filter: GetProjectsFilter,
+    @Args('filter', new InputValidator()) filter: GetMyProjectsFilter,
     @CurrentUser() user
   ) {
     // Todo: check admin, permission
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
     _filter.owner = user._id
+    if (filter.active.length) {
+      _filter.active = { $in: filter.active }
+    }
     return this.projectsService.find(_filter, filter)
   }
 
