@@ -55,6 +55,12 @@ type Category {
   slug: String!
 }
 
+input CheckProposalInput {
+  id: ID!
+  note: String!
+  status: ProposalStatus!
+}
+
 type Comment {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -186,6 +192,7 @@ input GetUsersFilter {
 }
 
 type Mutation {
+  checkProposal(input: CheckProposalInput!): Proposal!
   createBookmark(createBookmarkInput: CreateBookmarkInput!): Bookmark!
   createCategory(input: CreateCategoryInput!): Category!
   createComment(createCommentInput: CreateCommentInput!): Comment!
@@ -198,7 +205,7 @@ type Mutation {
   removeCategory(input: DeleteCategoryInput!): Category!
   removeComment(id: Int!): Comment!
   removeProject(input: RemoveProjectInput!): Project!
-  removeProposal(id: Int!): Proposal!
+  removeProposal(input: RemoveProposalInput!): Proposal!
   removeRole(input: RemoveRoleInput!): Role!
   removeStep(input: RemoveStepInput!): Step!
   removeTechnology(input: RemoveTechnologyInput!): Technology!
@@ -209,7 +216,7 @@ type Mutation {
   updateCategory(input: UpdateCategoryInput!): Category!
   updateComment(updateCommentInput: UpdateCommentInput!): Comment!
   updateProject(input: UpdateProjectInput!): Project!
-  updateProposal(updateProposalInput: UpdateProposalInput!): Proposal!
+  updateProposal(input: UpdateProposalInput!): Proposal!
   updateRole(input: UpdateRoleInput!): Role!
   updateStep(input: UpdateStepInput!): Step!
   updateTechnology(input: UpdateTechnologyInput!): Technology!
@@ -275,14 +282,15 @@ type Proposal {
   id: ID!
   letter: String!
   note: String!
+  project: Project!
   resume: String!
   role: Role!
-  status: ProposalEnum!
+  status: ProposalStatus!
   updatedAt: Float!
   user: User
 }
 
-enum ProposalEnum {
+enum ProposalStatus {
   APPROVED
   REJECTED
   WAITING
@@ -312,6 +320,10 @@ type Query {
 }
 
 input RemoveProjectInput {
+  id: ID!
+}
+
+input RemoveProposalInput {
   id: ID!
 }
 
@@ -415,7 +427,7 @@ input UpdateProjectInput {
 }
 
 input UpdateProposalInput {
-  id: Int!
+  id: ID!
   letter: String
   resume: String
   role: ID

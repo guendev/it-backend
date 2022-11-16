@@ -8,5 +8,5 @@ export enum ProposalStatus {
 }
 
 registerEnumType(ProposalStatus, {
-  name: 'ProposalEnum'
+  name: 'ProposalStatus'
 })
