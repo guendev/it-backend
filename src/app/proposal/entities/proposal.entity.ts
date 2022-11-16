@@ -3,7 +3,8 @@ import { Document, Types } from 'mongoose'
 import { Field, Float, ID, ObjectType } from '@nestjs/graphql'
 import { User, UserDocument } from '@app/users/entities/user.entity'
 import { Role, RoleDocument } from '@app/roles/entities/role.entity'
-import { ProposalEnum } from '@app/proposal/enums/proposal.enum'
+import { ProposalStatus } from '@app/proposal/enums/proposal.enum'
+import { Project, ProjectDocument } from '@app/projects/entities/project.entity'
 
 export type ProposalDocument = Proposal & Document
 
@@ -36,18 +37,25 @@ export class Proposal {
     type: Types.ObjectId,
     index: true
   })
+  @Field(() => Project)
+  project: ProjectDocument | Types.ObjectId
+
+  @Prop({
+    type: Types.ObjectId,
+    index: true
+  })
   @Field(() => Role)
   role: RoleDocument | Types.ObjectId
 
   // Dự án đang chạy hay là chuẩn bị
   @Prop({
     index: true,
-    default: ProposalEnum.WAITING,
+    default: ProposalStatus.WAITING,
     type: Number,
-    enum: ProposalEnum
+    enum: ProposalStatus
   })
-  @Field(() => ProposalEnum, { defaultValue: ProposalEnum.WAITING })
-  status: ProposalEnum
+  @Field(() => ProposalStatus, { defaultValue: ProposalStatus.WAITING })
+  status: ProposalStatus
 
   // Người được phân quyền
   @Field(() => User, { nullable: true })

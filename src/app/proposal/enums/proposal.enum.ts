@@ -1,12 +1,12 @@
 import { registerEnumType } from '@nestjs/graphql'
 
-export enum ProposalEnum {
+export enum ProposalStatus {
   // Chờ phê duyệt
   WAITING,
   APPROVED,
   REJECTED
 }
 
-registerEnumType(ProposalEnum, {
+registerEnumType(ProposalStatus, {
   name: 'ProposalEnum'
 })

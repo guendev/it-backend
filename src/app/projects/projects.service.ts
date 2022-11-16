@@ -13,6 +13,10 @@ export class ProjectsService {
     @InjectModel(Project.name) private model: Model<ProjectDocument>
   ) {}
 
+  instance() {
+    return this.model
+  }
+
   async create(user: UserDocument, input: CreateProjectInput) {
     return this.model.create({
       ...input,

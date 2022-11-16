@@ -7,6 +7,7 @@ import {
   Proposal,
   ProposalEntity
 } from '@app/proposal/entities/proposal.entity'
+import { ProjectsModule } from '@app/projects/projects.module'
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import {
         }
       }
     ]),
-    RolesModule
+    RolesModule,
+    ProjectsModule
   ],
   providers: [ProposalResolver, ProposalService]
 })

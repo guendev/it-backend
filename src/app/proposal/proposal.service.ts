@@ -1,48 +1,86 @@
 import { Injectable } from '@nestjs/common'
-import { CreateProposalInput } from './dto/create-proposal.input'
-import { UpdateProposalInput } from './dto/update-proposal.input'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model, Types } from 'mongoose'
+import { FilterQuery, Model } from 'mongoose'
 import {
   Proposal,
   ProposalDocument
 } from '@app/proposal/entities/proposal.entity'
-import { UserDocument } from '@app/users/entities/user.entity'
-import { RoleDocument } from '@app/roles/entities/role.entity'
+import { ProjectDocument } from '@app/projects/entities/project.entity'
+import { ProjectsService } from '@app/projects/projects.service'
 
 @Injectable()
 export class ProposalService {
   constructor(
-    @InjectModel(Proposal.name) private model: Model<ProposalDocument>
+    @InjectModel(Proposal.name) private model: Model<ProposalDocument>,
+    private readonly projectsService: ProjectsService
   ) {}
 
-  async create(
-    user: UserDocument,
-    role: RoleDocument,
-    input: Partial<Omit<Proposal, 'role' | 'user' | 'id'>>
-  ) {
+  async create(doc: Partial<Omit<Proposal, 'role' | 'user' | 'id'>>) {
     return this.model.create({
-      ...input,
-      user: user._id,
-      role: role._id,
+      ...doc,
       createdAt: Date.now(),
       updatedAt: Date.now()
     })
   }
 
-  findAll() {
-    return `This action returns all proposal`
+  async find(project: ProjectDocument) {
+    return this.model.find({ project: project._id }).sort({
+      createdAt: -1
+    })
+    //.aggregate([
+    //   {
+    //     $lookup: {
+    //       from: 'roles',
+    //       localField: 'role',
+    //       foreignField: '_id',
+    //       as: 'role'
+    //     }
+    //   },
+    //   {
+    //     $unwind: '$role'
+    //   },
+    //   {
+    //     $match: {
+    //       'role.project': project._id
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'users',
+    //       localField: 'user',
+    //       foreignField: '_id',
+    //       as: 'user'
+    //     }
+    //   },
+    //   {
+    //     $unwind: '$user'
+    //   },
+    //   {
+    //     $addFields: {
+    //       id: { $toString: '$_id' },
+    //       'role.id': { $toString: '$role._id' },
+    //       'user.id': { $toString: '$user._id' }
+    //     }
+    //   }
+    // ])
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} proposal`
+  async findOne(filter: FilterQuery<ProposalDocument>) {
+    return this.model.findOne(filter)
   }
 
-  update(id: number, updateProposalInput: UpdateProposalInput) {
-    return `This action updates a #${id} proposal`
+  async update(proposal: ProposalDocument, doc: Partial<Omit<Proposal, 'id'>>) {
+    return this.model.findByIdAndUpdate(
+      proposal._id,
+      {
+        ...doc,
+        updatedAt: Date.now()
+      },
+      { new: true }
+    )
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} proposal`
+  async remove(filter: FilterQuery<ProposalDocument>) {
+    return this.model.findOneAndDelete(filter)
   }
 }

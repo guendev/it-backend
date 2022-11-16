@@ -157,6 +157,10 @@ input GetProjectsFilter {
   technologies: [ID!]
 }
 
+input GetProposalsFilter {
+  project: ID!
+}
+
 input GetRolesInput {
   project: ID!
 }
@@ -296,6 +300,7 @@ type Query {
   project(project: String!): Project!
   projects(filter: GetProjectsFilter!): [Project!]!
   proposal(id: Int!): Proposal!
+  proposals(filter: GetProposalsFilter!): [Proposal!]!
   roles(filter: GetRolesInput!): [Role!]!
   steps(filter: GetStepsFilter!): [Step!]!
   studioProject(filter: GetProjectFilter!): Project!
