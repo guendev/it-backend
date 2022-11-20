@@ -1,11 +1,11 @@
 import {
-  Resolver,
-  Query,
-  Mutation,
   Args,
   Int,
+  Mutation,
+  Parent,
+  Query,
   ResolveField,
-  Parent
+  Resolver
 } from '@nestjs/graphql'
 import { ProposalService } from './proposal.service'
 import { Proposal } from './entities/proposal.entity'
@@ -25,6 +25,7 @@ import { UseGuards } from '@nestjs/common'
 import { CurrentUser } from '@decorators/user.decorator'
 import { ForbiddenError } from 'apollo-server-express'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
+import { ProposalStatus } from '@app/proposal/enums/proposal.enum'
 
 @Resolver(() => Proposal)
 export class ProposalResolver {
@@ -84,14 +85,39 @@ export class ProposalResolver {
   }
 
   @Query(() => [Proposal], { name: 'proposals' })
-  async find(@Args('filter', new InputValidator()) filter: GetProposalsFilter) {
+  @UseGuards(FirebaseAuthGuard)
+  async find(
+    @Args('filter', new InputValidator()) filter: GetProposalsFilter,
+    @CurrentUser() user
+  ) {
     const _project = await this.projectsService.findOne({
       _id: new Types.ObjectId(filter.project)
     })
     if (!_project) {
       throw new NotFoundError('Project not found')
     }
-    // Todo: check permissions
+
+    // check user đã quyên role hay ko
+    if (_project.owner.toString() !== user._id.toString()) {
+      const _role = await this.rolesService.findOne({
+        project: _project._id,
+        user: user._id
+      })
+      if (!_role) {
+        throw new ForbiddenError('You not have permission')
+      }
+      if (
+        !_role.permissions.some((per) =>
+          [
+            PermissionEnum.CREATE_ROLE,
+            PermissionEnum.UPDATE_ROLE,
+            PermissionEnum.REMOVE_ROLE
+          ].includes(per)
+        )
+      ) {
+        throw new ForbiddenError('You not have permission')
+      }
+    }
     return this.proposalService.find(_project)
   }
 
@@ -101,13 +127,14 @@ export class ProposalResolver {
     @Args('input', new InputValidator()) input: CheckProposalInput,
     @CurrentUser() user
   ) {
+    // check lời mời
     const _proposal = await this.proposalService.findOne({
       _id: new Types.ObjectId(input.id)
     })
     if (!_proposal) {
       throw new NotFoundError('Proposal not found')
     }
-    // Todo: check permissions
+    // check dự án
     const project = await this.projectsService.findOne({
       _id: _proposal.project
     })
@@ -115,7 +142,7 @@ export class ProposalResolver {
       throw new NotFoundError('Project not found')
     }
 
-    // KO dc phép duyệt owner
+    // Ko dc phép duyệt owner
     if (project.owner.toString() !== user._id.toString()) {
       throw new ForbiddenError('You are not allowed to do this')
     }
@@ -148,12 +175,17 @@ export class ProposalResolver {
   }
 
   @Query(() => Proposal, { name: 'proposal' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  async findOne(@Args('id', { type: () => Int }) id: number) {
     // return this.proposalService.findOne(id)
   }
 
   @Mutation(() => Proposal)
-  async updateProposal(@Args('input') input: UpdateProposalInput) {
+  @UseGuards(FirebaseAuthGuard)
+  async updateProposal(
+    @Args('input') input: UpdateProposalInput,
+    @CurrentUser() user
+  ) {
+    // Kiểm tra lời mời
     const _proposal = await this.proposalService.findOne({
       _id: new Types.ObjectId(input.id)
     })
@@ -161,6 +193,17 @@ export class ProposalResolver {
       throw new NotFoundError('Proposal not found')
     }
 
+    // chỉ chủ dự án mới dc phép sửa
+    if (_proposal.user.toString() !== user._id.toString()) {
+      throw new ForbiddenError('You are not allowed to do this')
+    }
+
+    // Ko dc sửa khi đã dc duyệt
+    if (_proposal.status === ProposalStatus.APPROVED) {
+      throw new ForbiddenError('You are not allowed to do this')
+    }
+
+    // check vị trí có tồn tại hay ko
     const _role = await this.rolesService.findOne({
       _id: new Types.ObjectId(input.role)
     })
@@ -168,23 +211,31 @@ export class ProposalResolver {
       throw new NotFoundError('Role not found')
     }
 
+    // KO dc phép update _id dự án
     return this.proposalService.update(_proposal, {
       resume: input.resume,
       letter: input.letter,
-      role: _role._id,
-      project: _role.project
+      role: _role._id
     })
   }
 
   @Mutation(() => Proposal)
+  @UseGuards(FirebaseAuthGuard)
   async removeProposal(
-    @Args('input', new InputValidator()) input: RemoveProposalInput
+    @Args('input', new InputValidator()) input: RemoveProposalInput,
+    @CurrentUser() user
   ) {
+    // kiểm tra lời mời
     const _proposal = await this.proposalService.findOne({
       _id: new Types.ObjectId(input.id)
     })
     if (!_proposal) {
       throw new NotFoundError('Proposal not found')
+    }
+
+    // only candidate can remove proposal
+    if (_proposal.user.toString() !== user._id.toString()) {
+      throw new ForbiddenError('You are not allowed to do this')
     }
     return this.proposalService.remove({ _id: _proposal._id })
   }
