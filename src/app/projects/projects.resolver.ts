@@ -66,6 +66,7 @@ export class ProjectsResolver {
   async find(@Args('filter', new InputValidator()) filter: GetProjectsFilter) {
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
     _filter.active = ProjectActive.ACTIVE
+    console.log(_filter)
     return this.projectsService.find(_filter, filter)
   }
 
@@ -178,6 +179,7 @@ export class ProjectsResolver {
   ) {
     // Todo: check admin, permission
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
+
     _filter.owner = user._id
     if (filter.active.length) {
       _filter.active = { $in: filter.active }

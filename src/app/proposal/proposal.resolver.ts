@@ -20,6 +20,11 @@ import { UsersService } from '@app/users/users.service'
 import { CheckProposalInput } from '@app/proposal/dto/check-proposal.input'
 import { UpdateProposalInput } from '@app/proposal/dto/update-proposal.input'
 import { RemoveProposalInput } from '@app/proposal/dto/remove-proposal.input'
+import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
+import { UseGuards } from '@nestjs/common'
+import { CurrentUser } from '@decorators/user.decorator'
+import { ForbiddenError } from 'apollo-server-express'
+import { PermissionEnum } from '@app/roles/enums/role.enum'
 
 @Resolver(() => Proposal)
 export class ProposalResolver {
@@ -31,9 +36,10 @@ export class ProposalResolver {
   ) {}
 
   @Mutation(() => Proposal)
-  //  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseAuthGuard)
   async createProposal(
-    @Args('input', new InputValidator()) input: CreateProposalInput
+    @Args('input', new InputValidator()) input: CreateProposalInput,
+    @CurrentUser() user
   ) {
     const _role = await this.rolesService.findOne({
       _id: new Types.ObjectId(input.role)
@@ -41,9 +47,28 @@ export class ProposalResolver {
     if (!_role) {
       throw new NotFoundError('Role not found')
     }
-
-    const user: any = {
-      _id: new Types.ObjectId('6373ab75d651155c77df3376')
+    // check dự án
+    const _project = await this.projectsService.findOne({
+      _id: _role.project
+    })
+    if (!_project) {
+      throw new NotFoundError('Project not found')
+    }
+    // check user đã có vai trờ hay chưa
+    const role = await this.rolesService.findOne({
+      user: user._id,
+      project: _project._id
+    })
+    if (role) {
+      throw new ForbiddenError('You already has role')
+    }
+    // check user đã gửi đề nghị hay chưa
+    const _proposal = await this.proposalService.findOne({
+      user: user._id,
+      project: _project._id
+    })
+    if (_proposal) {
+      throw new ForbiddenError('You already has proposal')
     }
 
     const _doc: Partial<Omit<Proposal, 'role' | 'user' | 'id'>> = Object.assign(
@@ -71,8 +96,10 @@ export class ProposalResolver {
   }
 
   @Mutation(() => Proposal)
+  @UseGuards(FirebaseAuthGuard)
   async checkProposal(
-    @Args('input', new InputValidator()) input: CheckProposalInput
+    @Args('input', new InputValidator()) input: CheckProposalInput,
+    @CurrentUser() user
   ) {
     const _proposal = await this.proposalService.findOne({
       _id: new Types.ObjectId(input.id)
@@ -81,6 +108,38 @@ export class ProposalResolver {
       throw new NotFoundError('Proposal not found')
     }
     // Todo: check permissions
+    const project = await this.projectsService.findOne({
+      _id: _proposal.project
+    })
+    if (!project) {
+      throw new NotFoundError('Project not found')
+    }
+
+    // KO dc phép duyệt owner
+    if (project.owner.toString() !== user._id.toString()) {
+      throw new ForbiddenError('You are not allowed to do this')
+    }
+
+    const _role = await this.rolesService.findOne({
+      project: project._id,
+      user: user._id
+    })
+    // KO có quyền
+    if (!_role) {
+      throw new ForbiddenError('You are not allowed to do this')
+    }
+    // KO đủ quyền
+    if (_role.permissions.includes(PermissionEnum.UPDATE_ROLE)) {
+      throw new ForbiddenError('You are not allowed to do this')
+    }
+    const existRole = await this.rolesService.findOne({
+      project: project._id,
+      user: _proposal.user
+    })
+    if (existRole) {
+      throw new ForbiddenError('User already has role')
+    }
+
     // Người kiểm duyệt chỉ dc phép duyệt hoặc từ chối
     return this.proposalService.update(_proposal, {
       note: input.note,
