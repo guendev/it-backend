@@ -8,6 +8,7 @@ import App = app.App
 import * as firebase from 'firebase-admin'
 import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier'
 import { FilterOffet } from '@shared/args/filter-offset.input'
+import { UserRole } from '@app/users/enum/role.enum'
 
 const firebase_params = {
   type: firebaseConfig.type,
@@ -77,5 +78,9 @@ export class UsersService {
       const record = await this.defaultApp.auth().getUser(firebaseUser.uid)
       return this.create(record)
     }
+  }
+
+  isAdmin(user: UserDocument) {
+    return [UserRole.SP_ADMIN, UserRole.ADMIN].includes(user.role)
   }
 }

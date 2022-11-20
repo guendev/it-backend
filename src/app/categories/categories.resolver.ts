@@ -10,6 +10,8 @@ import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
 import { PUB_SUB } from '@apollo/pubsub.module'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { DeleteCategoryInput } from '@app/categories/dto/delete-category.input'
+import { CurrentUser } from '@decorators/user.decorator'
+import { UserRole } from '@app/users/enum/role.enum'
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -21,9 +23,10 @@ export class CategoriesResolver {
   @Mutation(() => Category)
   @UseGuards(FirebaseAuthGuard)
   async createCategory(
-    @Args('input', new InputValidator())
-    input: CreateCategoryInput
+    @Args('input', new InputValidator()) input: CreateCategoryInput,
+    @CurrentUser() user
   ) {
+    // Todo: Only admin can create category
     return this.categoriesService.create(input)
   }
 

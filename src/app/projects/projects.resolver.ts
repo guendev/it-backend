@@ -33,6 +33,8 @@ import { ExampleProjectsFilter } from '@app/projects/filters/example-projects.fi
 import { StudioCountProjectsFilter } from '@app/projects/filters/count-projects.filter'
 import { GetProjectFilter } from '@app/projects/filters/get-project.filter'
 import { ApproveProjectInput } from '@app/projects/dto/approve-project.input'
+import { PermissionEnum } from '@app/roles/enums/role.enum'
+import { UserRole } from '@app/users/enum/role.enum'
 
 @Resolver(() => Project)
 export class ProjectsResolver {
@@ -66,7 +68,6 @@ export class ProjectsResolver {
   async find(@Args('filter', new InputValidator()) filter: GetProjectsFilter) {
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
     _filter.active = ProjectActive.ACTIVE
-    console.log(_filter)
     return this.projectsService.find(_filter, filter)
   }
 
@@ -91,12 +92,26 @@ export class ProjectsResolver {
   }
 
   @Mutation(() => Project)
-  async updateProject(@Args('input') input: UpdateProjectInput) {
+  @UseGuards(FirebaseAuthGuard)
+  async updateProject(
+    @Args('input') input: UpdateProjectInput,
+    @CurrentUser() user
+  ) {
     const _project = await this.projectsService.findOne({
       _id: new Types.ObjectId(input.id)
     })
     if (!_project) throw new NotFoundError('Project not found')
-    // Todo: check permission
+    // Todo: check admin permission
+    // Skip validate when if user is project owner
+    if (user._id.toString() !== _project.owner.toString()) {
+      // check role
+      const _role = await this.rolesService.findOne({
+        project: _project._id,
+        user: user._id,
+        permissions: PermissionEnum.UPDATE_PROJECT
+      })
+      if (!_role) throw new NotFoundError('Permission denied')
+    }
 
     const [category, technologies] = await Promise.all([
       this.getCategory(input.category),
@@ -111,14 +126,31 @@ export class ProjectsResolver {
   }
 
   @Mutation(() => Project)
+  @UseGuards(FirebaseAuthGuard)
   async removeProject(
-    @Args('input', new InputValidator()) input: RemoveProjectInput
+    @Args('input', new InputValidator()) input: RemoveProjectInput,
+    @CurrentUser() user
   ) {
     const _project = await this.projectsService.findOne({
       _id: new Types.ObjectId(input.id)
     })
     if (!_project) throw new NotFoundError('Project not found')
-    // Todo: check permission
+
+    // Todo: check admin permission
+
+    if (
+      user._id.toString() !== _project.owner.toString() &&
+      !this.usersService.isAdmin(user)
+    ) {
+      // check role
+      const _role = await this.rolesService.findOne({
+        project: _project._id,
+        user: user._id,
+        permissions: PermissionEnum.REMOVE_PROJECT
+      })
+      if (!_role) throw new NotFoundError('Permission denied')
+    }
+
     return this.projectsService.remove(_project)
   }
 
@@ -180,7 +212,16 @@ export class ProjectsResolver {
     // Todo: check admin, permission
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
 
-    _filter.owner = user._id
+    // admin can skip permission check
+    if (![UserRole.SP_ADMIN, UserRole.ADMIN].includes(user.role)) {
+      const roles = await this.rolesService.find({ user: user._id })
+      // Find projects by owner or roles
+      _filter.$or = [
+        { owner: user._id },
+        { _id: { $in: roles.map((role) => role.project) } }
+      ]
+    }
+
     if (filter.active.length) {
       _filter.active = { $in: filter.active }
     }
