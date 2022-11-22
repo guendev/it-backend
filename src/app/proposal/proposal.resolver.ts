@@ -165,7 +165,7 @@ export class ProposalResolver {
       }
       // KO đủ quyền
       if (_role.permissions.includes(PermissionEnum.UPDATE_ROLE)) {
-        throw new ForbiddenError('You are not allowed to do this')
+        throw new ForbiddenError('You are not allowed to do  this')
       }
     }
 
