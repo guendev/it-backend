@@ -40,7 +40,7 @@ export class User {
   @Field(() => UserRole, { defaultValue: UserRole.USER })
   role: UserRole.USER
 
-  @Prop()
+  @Prop({ type: String, default: 'https://i.imgur.com/pqGLgGr.jpg' })
   @Field(() => String, {
     nullable: true,
     defaultValue: 'https://i.imgur.com/pqGLgGr.jpg'
