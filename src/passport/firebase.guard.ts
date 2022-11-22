@@ -8,8 +8,8 @@ import { User } from '@app/users/entities/user.entity'
 import { Types } from 'mongoose'
 
 @Injectable()
-export class FirebaseAuthGuard extends AuthGuard('firebase-auth') {
-  private readonly logger = new Logger(FirebaseAuthGuard.name)
+export class FirebaseGuard extends AuthGuard('firebase-auth') {
+  private readonly logger = new Logger(FirebaseGuard.name)
 
   constructor(private reflector: Reflector) {
     super()

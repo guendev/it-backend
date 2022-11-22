@@ -24,7 +24,7 @@ import {
 } from '@app/projects/filters/get-projects.filter'
 import { ProjectActive } from '@app/projects/enums/project.active.enum'
 import { UseGuards } from '@nestjs/common'
-import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
+import { FirebaseGuard } from '@passport/firebase.guard'
 import { CurrentUser } from '@decorators/user.decorator'
 import { UsersService } from '@app/users/users.service'
 import { RolesService } from '@app/roles/roles.service'
@@ -48,7 +48,7 @@ export class ProjectsResolver {
   ) {}
 
   @Mutation(() => Project)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async createProject(
     @Args('input', new InputValidator()) input: CreateProjectInput,
     @CurrentUser() user
@@ -92,7 +92,7 @@ export class ProjectsResolver {
   }
 
   @Mutation(() => Project)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async updateProject(
     @Args('input') input: UpdateProjectInput,
     @CurrentUser() user
@@ -126,7 +126,7 @@ export class ProjectsResolver {
   }
 
   @Mutation(() => Project)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async removeProject(
     @Args('input', new InputValidator()) input: RemoveProjectInput,
     @CurrentUser() user
@@ -204,7 +204,7 @@ export class ProjectsResolver {
 
   // Studio
   @Query(() => [Project])
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async studioProjects(
     @Args('filter', new InputValidator()) filter: GetMyProjectsFilter,
     @CurrentUser() user
@@ -229,7 +229,7 @@ export class ProjectsResolver {
   }
 
   @Query(() => Project)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async studioProject(
     @Args('filter', new InputValidator()) filter: GetProjectFilter,
     @CurrentUser() user
@@ -242,7 +242,7 @@ export class ProjectsResolver {
   }
 
   @Query(() => Int)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async studioProjectsCount(
     @Args('filter', new InputValidator()) filter: StudioCountProjectsFilter,
     @CurrentUser() user

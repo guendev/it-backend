@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common'
+import { CacheModule, Module } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { FirebaseAuthStrategy } from '@passport/firebase-auth.strategy'
+import { FirebaseStrategy } from '@passport/firebase.strategy'
 import { ApolloModule } from '@apollo/apollo.module'
 import { UsersModule } from '@app/users/users.module'
 import { DatabaseModule } from './database/database.module'
@@ -19,7 +19,8 @@ import { StepModule } from '@app/step/step.module'
 import { RolesModule } from '@app/roles/roles.module'
 import { BookmarksModule } from './app/bookmarks/bookmarks.module'
 import { CommentsModule } from './app/comments/comments.module'
-import { ProposalModule } from './app/proposal/proposal.module';
+import { ProposalModule } from './app/proposal/proposal.module'
+import { AuthModule } from './app/auth/auth.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ProposalModule } from './app/proposal/proposal.module';
       rootPath: join(__dirname, '../../', 'public'),
       exclude: ['/graphql*']
     }),
+    CacheModule.register(),
     ApolloModule,
     UsersModule,
     DatabaseModule,
@@ -43,9 +45,10 @@ import { ProposalModule } from './app/proposal/proposal.module';
     RolesModule,
     BookmarksModule,
     CommentsModule,
-    ProposalModule
+    ProposalModule,
+    AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService, FirebaseAuthStrategy]
+  providers: [AppService, FirebaseStrategy]
 })
 export class AppModule {}

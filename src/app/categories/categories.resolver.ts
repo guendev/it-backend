@@ -6,7 +6,7 @@ import { UpdateCategoryInput } from './dto/update-category.input'
 import { InputValidator } from '@shared/validator/input.validator'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { Inject, UseGuards } from '@nestjs/common'
-import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
+import { FirebaseGuard } from '@passport/firebase.guard'
 import { PUB_SUB } from '@apollo/pubsub.module'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { DeleteCategoryInput } from '@app/categories/dto/delete-category.input'
@@ -21,7 +21,7 @@ export class CategoriesResolver {
   ) {}
 
   @Mutation(() => Category)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async createCategory(
     @Args('input', new InputValidator()) input: CreateCategoryInput,
     @CurrentUser() user
@@ -45,7 +45,7 @@ export class CategoriesResolver {
   }
 
   @Mutation(() => Category)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async updateCategory(
     @Args('input', new InputValidator()) input: UpdateCategoryInput
   ) {
@@ -63,7 +63,7 @@ export class CategoriesResolver {
   }
 
   @Mutation(() => Category)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async removeCategory(
     @Args('input', new InputValidator()) input: DeleteCategoryInput
   ) {

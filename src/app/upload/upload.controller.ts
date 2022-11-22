@@ -16,7 +16,7 @@ import { UploadSizeBuilder } from '@app/upload/builder/upload-size.builder'
 import { UploadNameBuilder } from '@app/upload/builder/upload-name.builder'
 import { UploadFileBuilder } from '@app/upload/builder/upload-file.builder'
 import { UploadService } from '@app/upload/upload.service'
-import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
+import { FirebaseGuard } from '@passport/firebase.guard'
 
 @Controller('upload')
 export class UploadController {
@@ -24,7 +24,7 @@ export class UploadController {
 
   @Post('single')
   @UseInterceptors(uploadSingleFilter)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async single(
     @UploadedFile() file: Express.Multer.File,
     @Body('endpoint') endpoint: UploadSingleEnum,
@@ -51,7 +51,7 @@ export class UploadController {
 
   @Post('document')
   @UseInterceptors(uploadDocumentFilter)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async document(
     @UploadedFile() file: Express.Multer.File,
     @Body('endpoint') endpoint: UploadSingleEnum,

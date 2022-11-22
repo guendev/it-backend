@@ -5,7 +5,7 @@ import ChanelEnum from '@apollo/chanel.enum'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { PUB_SUB } from '@apollo/pubsub.module'
 import { Inject, Logger, UseGuards } from '@nestjs/common'
-import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
+import { FirebaseGuard } from '@passport/firebase.guard'
 import { CurrentUser } from '@decorators/user.decorator'
 import { UserDocument } from '@app/users/entities/user.entity'
 
@@ -24,7 +24,7 @@ export class NotifyResolver {
       return subNotify.user.uid === user.uid
     }
   })
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async subNotify(@CurrentUser() user: UserDocument) {
     this.logger.log(`subNotify: ${user.uid}`)
     return this.pubSub.asyncIterator(ChanelEnum.NOTIFY)

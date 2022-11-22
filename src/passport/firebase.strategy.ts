@@ -5,11 +5,11 @@ import { UsersService } from '@app/users/users.service'
 import { UserDocument } from '@app/users/entities/user.entity'
 
 @Injectable()
-export class FirebaseAuthStrategy extends PassportStrategy(
+export class FirebaseStrategy extends PassportStrategy(
   Strategy,
   'firebase-auth'
 ) {
-  private readonly logger = new Logger(FirebaseAuthStrategy.name)
+  private readonly logger = new Logger(FirebaseStrategy.name)
 
   constructor(protected usersService: UsersService) {
     super({

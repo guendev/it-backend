@@ -3,6 +3,7 @@ import { UsersService } from './users.service'
 import { UsersResolver } from './users.resolver'
 import { MongooseModule } from '@nestjs/mongoose'
 import { User, UserEntity } from '@app/users/entities/user.entity'
+import { UserController } from '@app/users/user.controller'
 
 @Global()
 @Module({
@@ -19,6 +20,7 @@ import { User, UserEntity } from '@app/users/entities/user.entity'
     ])
   ],
   providers: [UsersResolver, UsersService],
+  controllers: [UserController],
   exports: [UsersService]
 })
 export class UsersModule {}

@@ -9,7 +9,7 @@ import { Types } from 'mongoose'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { RemoveStepInput } from '@app/step/dto/remove-step.input'
 import { UseGuards } from '@nestjs/common'
-import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
+import { FirebaseGuard } from '@passport/firebase.guard'
 import { GetStepsFilter } from '@app/step/filters/get-steps.filter'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { SortStepsInput } from '@app/step/dto/sort-steps.input'
@@ -24,7 +24,7 @@ export class StepResolver {
   ) {}
 
   @Mutation(() => Step)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async createStep(
     @Args('input', new InputValidator()) input: CreateStepInput
   ) {

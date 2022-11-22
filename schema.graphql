@@ -163,6 +163,10 @@ input GetProjectsFilter {
   technologies: [ID!]
 }
 
+input GetProposalFilter {
+  project: ID!
+}
+
 input GetProposalsFilter {
   project: ID!
 }
@@ -307,7 +311,7 @@ type Query {
   me: User!
   project(project: String!): Project!
   projects(filter: GetProjectsFilter!): [Project!]!
-  proposal(id: Int!): Proposal!
+  proposal(filter: GetProposalFilter!): Proposal!
   proposals(filter: GetProposalsFilter!): [Proposal!]!
   roles(filter: GetRolesInput!): [Role!]!
   steps(filter: GetStepsFilter!): [Step!]!
@@ -468,6 +472,7 @@ type User {
 }
 
 enum UserRole {
+  ADMIN
   SP_ADMIN
   USER
 }

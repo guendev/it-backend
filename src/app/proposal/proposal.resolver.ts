@@ -20,12 +20,13 @@ import { UsersService } from '@app/users/users.service'
 import { CheckProposalInput } from '@app/proposal/dto/check-proposal.input'
 import { UpdateProposalInput } from '@app/proposal/dto/update-proposal.input'
 import { RemoveProposalInput } from '@app/proposal/dto/remove-proposal.input'
-import { FirebaseAuthGuard } from '@passport/firebase-auth.guard'
+import { FirebaseGuard } from '@passport/firebase.guard'
 import { UseGuards } from '@nestjs/common'
 import { CurrentUser } from '@decorators/user.decorator'
 import { ForbiddenError } from 'apollo-server-express'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
 import { ProposalStatus } from '@app/proposal/enums/proposal.enum'
+import { GetProposalFilter } from '@app/proposal/filters/get-proposal.filter'
 
 @Resolver(() => Proposal)
 export class ProposalResolver {
@@ -37,7 +38,7 @@ export class ProposalResolver {
   ) {}
 
   @Mutation(() => Proposal)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async createProposal(
     @Args('input', new InputValidator()) input: CreateProposalInput,
     @CurrentUser() user
@@ -85,7 +86,7 @@ export class ProposalResolver {
   }
 
   @Query(() => [Proposal], { name: 'proposals' })
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async find(
     @Args('filter', new InputValidator()) filter: GetProposalsFilter,
     @CurrentUser() user
@@ -122,7 +123,7 @@ export class ProposalResolver {
   }
 
   @Mutation(() => Proposal)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async checkProposal(
     @Args('input', new InputValidator()) input: CheckProposalInput,
     @CurrentUser() user
@@ -174,13 +175,27 @@ export class ProposalResolver {
     })
   }
 
-  @Query(() => Proposal, { name: 'proposal' })
-  async findOne(@Args('id', { type: () => Int }) id: number) {
-    // return this.proposalService.findOne(id)
+  @Query(() => Proposal, { name: 'proposal', nullable: true })
+  @UseGuards(FirebaseGuard)
+  async findOne(
+    @Args('filter', new InputValidator()) filter: GetProposalFilter,
+    @CurrentUser() user
+  ) {
+    // check dự án
+    const project = await this.projectsService.findOne({
+      _id: new Types.ObjectId(filter.project)
+    })
+    if (!project) {
+      throw new NotFoundError('Project not found')
+    }
+    return this.proposalService.findOne({
+      project: project._id,
+      user: user._id
+    })
   }
 
   @Mutation(() => Proposal)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async updateProposal(
     @Args('input') input: UpdateProposalInput,
     @CurrentUser() user
@@ -220,7 +235,7 @@ export class ProposalResolver {
   }
 
   @Mutation(() => Proposal)
-  @UseGuards(FirebaseAuthGuard)
+  @UseGuards(FirebaseGuard)
   async removeProposal(
     @Args('input', new InputValidator()) input: RemoveProposalInput,
     @CurrentUser() user
