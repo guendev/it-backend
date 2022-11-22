@@ -20,14 +20,14 @@ import { UsersService } from '@app/users/users.service'
 import { CheckProposalInput } from '@app/proposal/dto/check-proposal.input'
 import { UpdateProposalInput } from '@app/proposal/dto/update-proposal.input'
 import { RemoveProposalInput } from '@app/proposal/dto/remove-proposal.input'
-import { FirebaseGuard } from '@passport/firebase.guard'
+import { FirebaseGuard } from '../../guards/firebase.guard'
 import { UseGuards } from '@nestjs/common'
 import { CurrentUser } from '@decorators/user.decorator'
 import { ForbiddenError } from 'apollo-server-express'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
 import { ProposalStatus } from '@app/proposal/enums/proposal.enum'
 import { GetProposalFilter } from '@app/proposal/filters/get-proposal.filter'
-import { JWTAuthGuard } from "@passport/jwt.guard";
+import { JWTAuthGuard } from "../../guards/jwt.guard";
 
 @Resolver(() => Proposal)
 export class ProposalResolver {

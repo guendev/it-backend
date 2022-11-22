@@ -6,13 +6,13 @@ import { UpdateCategoryInput } from './dto/update-category.input'
 import { InputValidator } from '@shared/validator/input.validator'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { Inject, UseGuards } from '@nestjs/common'
-import { FirebaseGuard } from '@passport/firebase.guard'
+import { FirebaseGuard } from '../../guards/firebase.guard'
 import { PUB_SUB } from '@apollo/pubsub.module'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { DeleteCategoryInput } from '@app/categories/dto/delete-category.input'
 import { CurrentUser } from '@decorators/user.decorator'
 import { UserRole } from '@app/users/enum/role.enum'
-import { JWTAuthGuard } from "@passport/jwt.guard";
+import { JWTAuthGuard } from "../../guards/jwt.guard";
 
 @Resolver(() => Category)
 export class CategoriesResolver {

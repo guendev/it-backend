@@ -21,6 +21,7 @@ import { BookmarksModule } from './app/bookmarks/bookmarks.module'
 import { CommentsModule } from './app/comments/comments.module'
 import { ProposalModule } from './app/proposal/proposal.module'
 import { AuthModule } from './app/auth/auth.module';
+import { FirebaseModule } from './app/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { AuthModule } from './app/auth/auth.module';
     BookmarksModule,
     CommentsModule,
     ProposalModule,
-    AuthModule
+    AuthModule,
+    FirebaseModule
   ],
   controllers: [AppController],
   providers: [AppService, FirebaseStrategy]

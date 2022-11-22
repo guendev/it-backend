@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
 import { ApolloDriver } from '@nestjs/apollo'
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core'
-import { UsersModule } from '@app/users/users.module'
-import { UsersService } from '@app/users/users.service'
+import { AuthModule } from '@app/auth/auth.module'
+import { AuthService } from '@app/auth/auth.service'
 
 // import GraphQLJSON from 'graphql-type-json'
 
@@ -11,9 +11,9 @@ import { UsersService } from '@app/users/users.service'
   imports: [
     GraphQLModule.forRootAsync({
       driver: ApolloDriver,
-      imports: [UsersModule],
-      inject: [UsersService],
-      useFactory: (usersService: UsersService) => ({
+      imports: [AuthModule],
+      inject: [AuthService],
+      useFactory: (authService: AuthService) => ({
         playground: false,
         autoSchemaFile: true,
         sortSchema: true,
@@ -24,9 +24,7 @@ import { UsersService } from '@app/users/users.service'
           'subscriptions-transport-ws': {
             onConnect: async ({ Authorization }) => {
               if (Authorization) {
-                const user = await usersService.verifyToken(
-                  String(Authorization).split(' ')[1]
-                )
+                const user = await authService.checkToken(Authorization)
                 return {
                   isSubscription: true,
                   user,
@@ -39,8 +37,8 @@ import { UsersService } from '@app/users/users.service'
             onConnect: async (context: any) => {
               const { connectionParams, extra } = context
               if (connectionParams.Authorization) {
-                extra.user = await usersService.verifyToken(
-                  String(connectionParams.Authorization).split(' ')[1]
+                extra.user = await authService.checkToken(
+                  connectionParams.Authorization
                 )
                 extra._token = connectionParams.Authorization
               }

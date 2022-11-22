@@ -9,12 +9,12 @@ import { Types } from 'mongoose'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { RemoveStepInput } from '@app/step/dto/remove-step.input'
 import { UseGuards } from '@nestjs/common'
-import { FirebaseGuard } from '@passport/firebase.guard'
+import { FirebaseGuard } from '../../guards/firebase.guard'
 import { GetStepsFilter } from '@app/step/filters/get-steps.filter'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { SortStepsInput } from '@app/step/dto/sort-steps.input'
 import { StepStatus } from '@app/step/enums/step.status.enum'
-import { JWTAuthGuard } from "@passport/jwt.guard";
+import { JWTAuthGuard } from "../../guards/jwt.guard";
 
 @Resolver(() => Step)
 export class StepResolver {

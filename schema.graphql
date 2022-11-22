@@ -311,7 +311,7 @@ type Query {
   me: User!
   project(project: String!): Project!
   projects(filter: GetProjectsFilter!): [Project!]!
-  proposal(filter: GetProposalFilter!): Proposal!
+  proposal(filter: GetProposalFilter!): Proposal
   proposals(filter: GetProposalsFilter!): [Proposal!]!
   roles(filter: GetRolesInput!): [Role!]!
   steps(filter: GetStepsFilter!): [Step!]!

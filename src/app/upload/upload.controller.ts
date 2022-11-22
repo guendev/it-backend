@@ -16,8 +16,7 @@ import { UploadSizeBuilder } from '@app/upload/builder/upload-size.builder'
 import { UploadNameBuilder } from '@app/upload/builder/upload-name.builder'
 import { UploadFileBuilder } from '@app/upload/builder/upload-file.builder'
 import { UploadService } from '@app/upload/upload.service'
-import { FirebaseGuard } from '@passport/firebase.guard'
-import { JWTAuthGuard } from "@passport/jwt.guard";
+import { JWTAuthGuard } from '../../guards/jwt.guard'
 
 @Controller('upload')
 export class UploadController {

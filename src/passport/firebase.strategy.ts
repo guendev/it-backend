@@ -3,6 +3,7 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
 import { ExtractJwt, Strategy } from 'passport-firebase-jwt'
 import { UsersService } from '@app/users/users.service'
 import { UserDocument } from '@app/users/entities/user.entity'
+import { FirebaseService } from '@app/firebase/firebase.service'
 
 @Injectable()
 export class FirebaseStrategy extends PassportStrategy(
@@ -11,13 +12,14 @@ export class FirebaseStrategy extends PassportStrategy(
 ) {
   private readonly logger = new Logger(FirebaseStrategy.name)
 
-  constructor(protected usersService: UsersService) {
+  constructor(protected usersService: FirebaseService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
     })
   }
   async validate(token: string) {
-    const user: UserDocument | void = await this.usersService.verifyToken(token)
+    const user: UserDocument | void =
+      await this.usersService.verifyFirebaseToken(token)
     if (!user) {
       throw new UnauthorizedException()
     }

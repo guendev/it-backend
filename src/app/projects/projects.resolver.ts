@@ -24,7 +24,7 @@ import {
 } from '@app/projects/filters/get-projects.filter'
 import { ProjectActive } from '@app/projects/enums/project.active.enum'
 import { UseGuards } from '@nestjs/common'
-import { FirebaseGuard } from '@passport/firebase.guard'
+import { FirebaseGuard } from '../../guards/firebase.guard'
 import { CurrentUser } from '@decorators/user.decorator'
 import { UsersService } from '@app/users/users.service'
 import { RolesService } from '@app/roles/roles.service'
@@ -35,7 +35,7 @@ import { GetProjectFilter } from '@app/projects/filters/get-project.filter'
 import { ApproveProjectInput } from '@app/projects/dto/approve-project.input'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
 import { UserRole } from '@app/users/enum/role.enum'
-import { JWTAuthGuard } from "@passport/jwt.guard";
+import { JWTAuthGuard } from "../../guards/jwt.guard";
 
 @Resolver(() => Project)
 export class ProjectsResolver {
