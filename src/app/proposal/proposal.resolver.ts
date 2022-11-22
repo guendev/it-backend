@@ -20,14 +20,16 @@ import { UsersService } from '@app/users/users.service'
 import { CheckProposalInput } from '@app/proposal/dto/check-proposal.input'
 import { UpdateProposalInput } from '@app/proposal/dto/update-proposal.input'
 import { RemoveProposalInput } from '@app/proposal/dto/remove-proposal.input'
-import { FirebaseGuard } from '../../guards/firebase.guard'
-import { UseGuards } from '@nestjs/common'
+import { Inject, UseGuards } from '@nestjs/common'
 import { CurrentUser } from '@decorators/user.decorator'
 import { ForbiddenError } from 'apollo-server-express'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
 import { ProposalStatus } from '@app/proposal/enums/proposal.enum'
 import { GetProposalFilter } from '@app/proposal/filters/get-proposal.filter'
-import { JWTAuthGuard } from "../../guards/jwt.guard";
+import { JWTAuthGuard } from '../../guards/jwt.guard'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import { PUB_SUB } from '@apollo/pubsub.module'
+import ChanelEnum from '@apollo/chanel.enum'
 
 @Resolver(() => Proposal)
 export class ProposalResolver {
@@ -35,7 +37,8 @@ export class ProposalResolver {
     private readonly proposalService: ProposalService,
     private readonly rolesService: RolesService,
     private readonly projectsService: ProjectsService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    @Inject(PUB_SUB) private pubSub: RedisPubSub
   ) {}
 
   @Mutation(() => Proposal)
@@ -227,6 +230,9 @@ export class ProposalResolver {
       throw new NotFoundError('Role not found')
     }
 
+    await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      subNotify: { user, msg: 'Cập nhật thành công' }
+    })
     // KO dc phép update _id dự án
     return this.proposalService.update(_proposal, {
       resume: input.resume,

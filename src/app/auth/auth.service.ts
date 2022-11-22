@@ -32,9 +32,9 @@ export class AuthService {
     if (token) {
       try {
         const payload = await this.jwtService.verifyAsync(
-          token.replace('Bearer ', '').trim(),
+          token.replace('Bearer ', '').trim()
         )
-        return this.JWTVerify(payload.id)
+        return this.JWTVerify(new Types.ObjectId(payload.id))
       } catch (e) {
         console.log(e)
       }

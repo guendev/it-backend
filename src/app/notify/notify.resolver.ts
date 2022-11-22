@@ -17,12 +17,12 @@ export class NotifyResolver {
   @Subscription(() => Notify, {
     description: 'Nhận thông báo',
     filter: ({ subNotify }, variables, { user }) => {
-      return subNotify.user.uid === user.uid
+      return subNotify.user?.id === user?.id
     }
   })
   @UseGuards(SubscriptionGuard)
   async subNotify(@CurrentUser() user: UserDocument) {
-    this.logger.log(`subNotify: ${user.uid}`)
+    this.logger.log(`subNotify: ${user._id}`)
     return this.pubSub.asyncIterator(ChanelEnum.NOTIFY)
   }
 }
