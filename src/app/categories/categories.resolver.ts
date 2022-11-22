@@ -12,6 +12,7 @@ import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { DeleteCategoryInput } from '@app/categories/dto/delete-category.input'
 import { CurrentUser } from '@decorators/user.decorator'
 import { UserRole } from '@app/users/enum/role.enum'
+import { JWTAuthGuard } from "@passport/jwt.guard";
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -21,7 +22,7 @@ export class CategoriesResolver {
   ) {}
 
   @Mutation(() => Category)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async createCategory(
     @Args('input', new InputValidator()) input: CreateCategoryInput,
     @CurrentUser() user
@@ -45,7 +46,7 @@ export class CategoriesResolver {
   }
 
   @Mutation(() => Category)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async updateCategory(
     @Args('input', new InputValidator()) input: UpdateCategoryInput
   ) {
@@ -63,7 +64,7 @@ export class CategoriesResolver {
   }
 
   @Mutation(() => Category)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async removeCategory(
     @Args('input', new InputValidator()) input: DeleteCategoryInput
   ) {

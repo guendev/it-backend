@@ -3,6 +3,7 @@ import { AuthService } from './auth.service'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { UsersModule } from '@app/users/users.module'
+import { JwtStrategy } from '@passport/jwt.strategy'
 
 @Module({
   imports: [
@@ -16,9 +17,10 @@ import { UsersModule } from '@app/users/users.module'
       }),
       inject: [ConfigService]
     }),
-    forwardRef(() => UsersModule)
+    forwardRef(() => UsersModule),
+    ConfigModule
   ],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
   exports: [AuthService]
 })
 export class AuthModule {}

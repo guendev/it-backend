@@ -7,19 +7,20 @@ import { CurrentUser } from '@decorators/user.decorator'
 import { InputValidator } from '@shared/validator/input.validator'
 import { GetUsersFilter } from '@app/users/filters/get-users.filter'
 import { FilterQuery } from 'mongoose'
+import { JWTAuthGuard } from '@passport/jwt.guard'
 
 @Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Query(() => User, { name: 'me' })
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   getUser(@CurrentUser() user) {
     return user
   }
 
   @Query(() => [User], { name: 'users' })
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async getUsers(@Args('filter', new InputValidator()) filter: GetUsersFilter) {
     const _filter: FilterQuery<UserDocument> = {}
     if (filter.name) {

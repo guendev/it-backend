@@ -14,6 +14,7 @@ import { GetStepsFilter } from '@app/step/filters/get-steps.filter'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { SortStepsInput } from '@app/step/dto/sort-steps.input'
 import { StepStatus } from '@app/step/enums/step.status.enum'
+import { JWTAuthGuard } from "@passport/jwt.guard";
 
 @Resolver(() => Step)
 export class StepResolver {
@@ -24,7 +25,7 @@ export class StepResolver {
   ) {}
 
   @Mutation(() => Step)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async createStep(
     @Args('input', new InputValidator()) input: CreateStepInput
   ) {

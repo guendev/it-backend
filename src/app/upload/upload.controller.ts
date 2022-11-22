@@ -17,6 +17,7 @@ import { UploadNameBuilder } from '@app/upload/builder/upload-name.builder'
 import { UploadFileBuilder } from '@app/upload/builder/upload-file.builder'
 import { UploadService } from '@app/upload/upload.service'
 import { FirebaseGuard } from '@passport/firebase.guard'
+import { JWTAuthGuard } from "@passport/jwt.guard";
 
 @Controller('upload')
 export class UploadController {
@@ -24,7 +25,7 @@ export class UploadController {
 
   @Post('single')
   @UseInterceptors(uploadSingleFilter)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async single(
     @UploadedFile() file: Express.Multer.File,
     @Body('endpoint') endpoint: UploadSingleEnum,
@@ -51,7 +52,7 @@ export class UploadController {
 
   @Post('document')
   @UseInterceptors(uploadDocumentFilter)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async document(
     @UploadedFile() file: Express.Multer.File,
     @Body('endpoint') endpoint: UploadSingleEnum,

@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 
 import { UsersService } from '../users/users.service'
-import { UserDocument } from '../users/entities/user.entity'
+import { User } from '../users/entities/user.entity'
 import { Types } from 'mongoose'
 
 @Injectable()
@@ -29,7 +29,7 @@ export class AuthService {
     return this.usersService.findOne({ _id: id })
   }
 
-  async JWTGenerator(user: UserDocument) {
+  async JWTGenerator(user: User) {
     const payload = { id: user.id }
     return this.jwtService.sign(payload)
   }

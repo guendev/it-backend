@@ -35,6 +35,7 @@ import { GetProjectFilter } from '@app/projects/filters/get-project.filter'
 import { ApproveProjectInput } from '@app/projects/dto/approve-project.input'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
 import { UserRole } from '@app/users/enum/role.enum'
+import { JWTAuthGuard } from "@passport/jwt.guard";
 
 @Resolver(() => Project)
 export class ProjectsResolver {
@@ -48,7 +49,7 @@ export class ProjectsResolver {
   ) {}
 
   @Mutation(() => Project)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async createProject(
     @Args('input', new InputValidator()) input: CreateProjectInput,
     @CurrentUser() user
@@ -92,7 +93,7 @@ export class ProjectsResolver {
   }
 
   @Mutation(() => Project)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async updateProject(
     @Args('input') input: UpdateProjectInput,
     @CurrentUser() user
@@ -126,7 +127,7 @@ export class ProjectsResolver {
   }
 
   @Mutation(() => Project)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async removeProject(
     @Args('input', new InputValidator()) input: RemoveProjectInput,
     @CurrentUser() user
@@ -204,7 +205,7 @@ export class ProjectsResolver {
 
   // Studio
   @Query(() => [Project])
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async studioProjects(
     @Args('filter', new InputValidator()) filter: GetMyProjectsFilter,
     @CurrentUser() user
@@ -229,7 +230,7 @@ export class ProjectsResolver {
   }
 
   @Query(() => Project)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async studioProject(
     @Args('filter', new InputValidator()) filter: GetProjectFilter,
     @CurrentUser() user
@@ -242,7 +243,7 @@ export class ProjectsResolver {
   }
 
   @Query(() => Int)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async studioProjectsCount(
     @Args('filter', new InputValidator()) filter: StudioCountProjectsFilter,
     @CurrentUser() user

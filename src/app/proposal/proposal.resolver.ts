@@ -27,6 +27,7 @@ import { ForbiddenError } from 'apollo-server-express'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
 import { ProposalStatus } from '@app/proposal/enums/proposal.enum'
 import { GetProposalFilter } from '@app/proposal/filters/get-proposal.filter'
+import { JWTAuthGuard } from "@passport/jwt.guard";
 
 @Resolver(() => Proposal)
 export class ProposalResolver {
@@ -38,7 +39,7 @@ export class ProposalResolver {
   ) {}
 
   @Mutation(() => Proposal)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async createProposal(
     @Args('input', new InputValidator()) input: CreateProposalInput,
     @CurrentUser() user
@@ -86,7 +87,7 @@ export class ProposalResolver {
   }
 
   @Query(() => [Proposal], { name: 'proposals' })
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async find(
     @Args('filter', new InputValidator()) filter: GetProposalsFilter,
     @CurrentUser() user
@@ -123,7 +124,7 @@ export class ProposalResolver {
   }
 
   @Mutation(() => Proposal)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async checkProposal(
     @Args('input', new InputValidator()) input: CheckProposalInput,
     @CurrentUser() user
@@ -176,7 +177,7 @@ export class ProposalResolver {
   }
 
   @Query(() => Proposal, { name: 'proposal', nullable: true })
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async findOne(
     @Args('filter', new InputValidator()) filter: GetProposalFilter,
     @CurrentUser() user
@@ -195,7 +196,7 @@ export class ProposalResolver {
   }
 
   @Mutation(() => Proposal)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async updateProposal(
     @Args('input') input: UpdateProposalInput,
     @CurrentUser() user
@@ -235,7 +236,7 @@ export class ProposalResolver {
   }
 
   @Mutation(() => Proposal)
-  @UseGuards(FirebaseGuard)
+  @UseGuards(JWTAuthGuard)
   async removeProposal(
     @Args('input', new InputValidator()) input: RemoveProposalInput,
     @CurrentUser() user
