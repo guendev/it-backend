@@ -1,6 +1,5 @@
 import {
   Args,
-  Int,
   Mutation,
   Parent,
   Query,
@@ -102,25 +101,28 @@ export class ProposalResolver {
       throw new NotFoundError('Project not found')
     }
 
-    // check user đã quyên role hay ko
-    if (_project.owner.toString() !== user._id.toString()) {
-      const _role = await this.rolesService.findOne({
-        project: _project._id,
-        user: user._id
-      })
-      if (!_role) {
-        throw new ForbiddenError('You not have permission')
-      }
-      if (
-        !_role.permissions.some((per) =>
-          [
-            PermissionEnum.CREATE_ROLE,
-            PermissionEnum.UPDATE_ROLE,
-            PermissionEnum.REMOVE_ROLE
-          ].includes(per)
-        )
-      ) {
-        throw new ForbiddenError('You not have permission')
+    // admin can skip permission check
+    if (!this.usersService.isAdmin(user)) {
+      // check user đã quyên role hay ko
+      if (_project.owner.toString() !== user._id.toString()) {
+        const _role = await this.rolesService.findOne({
+          project: _project._id,
+          user: user._id
+        })
+        if (!_role) {
+          throw new ForbiddenError('You not have permission')
+        }
+        if (
+          !_role.permissions.some((per) =>
+            [
+              PermissionEnum.CREATE_ROLE,
+              PermissionEnum.UPDATE_ROLE,
+              PermissionEnum.REMOVE_ROLE
+            ].includes(per)
+          )
+        ) {
+          throw new ForbiddenError('You not have permission')
+        }
       }
     }
     return this.proposalService.find(_project)
@@ -147,23 +149,26 @@ export class ProposalResolver {
       throw new NotFoundError('Project not found')
     }
 
-    // Ko dc phép duyệt owner
-    if (project.owner.toString() !== user._id.toString()) {
-      throw new ForbiddenError('You are not allowed to do this')
+    if (!this.usersService.isAdmin(user)) {
+      // Ko dc phép duyệt owner
+      if (project.owner.toString() !== user._id.toString()) {
+        throw new ForbiddenError('You are not allowed to do this')
+      }
+
+      const _role = await this.rolesService.findOne({
+        project: project._id,
+        user: user._id
+      })
+      // KO có quyền
+      if (!_role) {
+        throw new ForbiddenError('You are not allowed to do this')
+      }
+      // KO đủ quyền
+      if (_role.permissions.includes(PermissionEnum.UPDATE_ROLE)) {
+        throw new ForbiddenError('You are not allowed to do this')
+      }
     }
 
-    const _role = await this.rolesService.findOne({
-      project: project._id,
-      user: user._id
-    })
-    // KO có quyền
-    if (!_role) {
-      throw new ForbiddenError('You are not allowed to do this')
-    }
-    // KO đủ quyền
-    if (_role.permissions.includes(PermissionEnum.UPDATE_ROLE)) {
-      throw new ForbiddenError('You are not allowed to do this')
-    }
     const existRole = await this.rolesService.findOne({
       project: project._id,
       user: _proposal.user

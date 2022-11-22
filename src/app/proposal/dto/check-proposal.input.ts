@@ -17,7 +17,6 @@ export class CheckProposalInput {
   status: ProposalStatus
 
   // Note
-  @Field(() => String)
-  @IsNotEmpty()
+  @Field(() => String, { nullable: true, defaultValue: '' })
   note: string
 }

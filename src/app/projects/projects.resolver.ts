@@ -213,7 +213,7 @@ export class ProjectsResolver {
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
 
     // admin can skip permission check
-    if (![UserRole.SP_ADMIN, UserRole.ADMIN].includes(user.role)) {
+    if (!this.usersService.isAdmin(user)) {
       const roles = await this.rolesService.find({ user: user._id })
       // Find projects by owner or roles
       _filter.$or = [
@@ -236,7 +236,10 @@ export class ProjectsResolver {
   ) {
     // Todo: check admin, permission
     const _filter: FilterQuery<ProjectDocument> = {}
-    _filter.owner = user._id
+    // admin can skip permission check
+    if (!this.usersService.isAdmin(user)) {
+      _filter.owner = user._id
+    }
     _filter._id = new Types.ObjectId(filter.id)
     return this.projectsService.findOne(_filter)
   }
@@ -249,7 +252,10 @@ export class ProjectsResolver {
   ) {
     // Todo: check admin, permission
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
-    _filter.owner = user._id
+    // admin can skip permission check
+    if (!this.usersService.isAdmin(user)) {
+      _filter.owner = user._id
+    }
     if (filter.active.length) {
       _filter.active = { $in: filter.active }
     }
