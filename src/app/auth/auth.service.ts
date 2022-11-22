@@ -33,9 +33,6 @@ export class AuthService {
       try {
         const payload = await this.jwtService.verifyAsync(
           token.replace('Bearer ', '').trim(),
-          {
-            algorithms: ['HS256']
-          }
         )
         return this.JWTVerify(payload.id)
       } catch (e) {
