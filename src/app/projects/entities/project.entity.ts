@@ -87,11 +87,11 @@ export class Project {
   files: string[]
 
   @Field(() => Float)
-  @Prop({ type: Number, index: true })
+  @Prop({ required: true, type: Number, index: true })
   createdAt: number
 
   @Field(() => Float)
-  @Prop({ type: Number, index: true })
+  @Prop({ required: true, type: Number, index: true })
   updatedAt: number
 
   // Dự án đang chạy hay là chuẩn bị

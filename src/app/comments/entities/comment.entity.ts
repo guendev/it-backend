@@ -40,7 +40,7 @@ export class Comment {
   parent: CommentDocument | Types.ObjectId
 
   @Field(() => Number)
-  @Prop({ required: true, trim: true })
+  @Prop({ required: true, type: Number, index: true })
   createdAt: number
 }
 

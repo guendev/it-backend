@@ -47,7 +47,7 @@ export class User {
   })
   avatar: string
 
-  @Prop()
+  @Prop({ required: true, type: Number, index: true })
   @Field(() => Float)
   createdAt: number
 }

@@ -28,7 +28,7 @@ export class CommentLike {
   comment: ProjectDocument | Types.ObjectId
 
   @Field(() => Number)
-  @Prop({ required: true, trim: true })
+  @Prop({ required: true, type: Number, index: true })
   createdAt: number
 }
 

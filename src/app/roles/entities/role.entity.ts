@@ -52,11 +52,11 @@ export class Role {
   order: number
 
   @Field(() => Float)
-  @Prop({ type: Number, index: true })
+  @Prop({ required: true, type: Number, index: true })
   createdAt: number
 
   @Field(() => Float)
-  @Prop({ type: Number, index: true })
+  @Prop({ required: true, type: Number, index: true })
   updatedAt: number
 }
 
