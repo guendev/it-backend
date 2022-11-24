@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCommentInput } from './dto/create-comment.input';
-import { UpdateCommentInput } from './dto/update-comment.input';
+import { Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { FilterQuery, Model } from 'mongoose'
+import { Comment, CommentDocument } from '@app/comments/entities/comment.entity'
+import { FilterOffet } from '@shared/args/filter-offset.input'
 
 @Injectable()
 export class CommentsService {
-  create(createCommentInput: CreateCommentInput) {
-    return 'This action adds a new comment';
+  constructor(
+    @InjectModel(Comment.name) private model: Model<CommentDocument>
+  ) {}
+
+  async create(input: Omit<Comment, 'id' | 'createdAt'>) {
+    return this.model.create({
+      ...input,
+      createdAt: Date.now()
+    })
   }
 
-  findAll() {
-    return `This action returns all comments`;
+  async find(filter: FilterQuery<CommentDocument>)
+
+  async find(filter: FilterQuery<CommentDocument>, options: FilterOffet)
+
+  async find(filter: FilterQuery<CommentDocument>, options?: FilterOffet) {
+    if (options) {
+      return this.model
+        .find(filter)
+        .sort({ [options.sort]: -1 })
+        .skip(options.offset)
+        .limit(options.limit)
+    }
+    return this.model.find(filter)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
-
-  update(id: number, updateCommentInput: UpdateCommentInput) {
-    return `This action updates a #${id} comment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async findOne(filter: FilterQuery<CommentDocument>) {
+    return this.model.findOne(filter)
   }
 }

@@ -6,9 +6,8 @@ export interface FirebaseUser {
   uid: string
   email: string
 }
-
-export const CurrentUser = createParamDecorator<UserDocument>(
-  async (data: unknown, context: ExecutionContext) => {
+export const CurrentUser = createParamDecorator(
+  async (data: unknown, context: ExecutionContext): Promise<UserDocument> => {
     const ctx = GqlExecutionContext.create(context).getContext()
     if (ctx.isSubscription) {
       return ctx.user

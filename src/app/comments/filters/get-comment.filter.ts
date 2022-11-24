@@ -4,9 +4,9 @@ import { IsObjectID } from '@shared/validator/objectid.validator'
 import { Types } from 'mongoose'
 
 @InputType()
-export class CreateBookmarkInput {
+export class GetCommentFilter {
   @Field(() => ID)
   @IsNotEmpty()
   @IsObjectID()
-  project: Types.ObjectId
+  id: Types.ObjectId
 }

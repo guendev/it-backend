@@ -1,35 +1,62 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { CommentsService } from './comments.service';
-import { Comment } from './entities/comment.entity';
-import { CreateCommentInput } from './dto/create-comment.input';
-import { UpdateCommentInput } from './dto/update-comment.input';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql'
+import { CommentsService } from './comments.service'
+import { Comment } from './entities/comment.entity'
+import { CreateCommentInput } from './dto/create-comment.input'
+import { UseGuards } from '@nestjs/common'
+import { JWTAuthGuard } from '@guards/jwt.guard'
+import { InputValidator } from '@shared/validator/input.validator'
+import { CurrentUser } from '@decorators/user.decorator'
+import { ProjectsService } from '@app/projects/projects.service'
+import { Types } from 'mongoose'
+import { NotFoundError } from '@shared/errors/not-found.error'
+import { User } from '@app/users/entities/user.entity'
+import { GetCommentsFilter } from '@app/comments/filters/get-comments.filter'
+import { GetCommentFilter } from '@app/comments/filters/get-comment.filter'
 
 @Resolver(() => Comment)
 export class CommentsResolver {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(
+    private readonly commentsService: CommentsService,
+    private readonly projectsService: ProjectsService
+  ) {}
 
   @Mutation(() => Comment)
-  createComment(@Args('createCommentInput') createCommentInput: CreateCommentInput) {
-    return this.commentsService.create(createCommentInput);
+  @UseGuards(JWTAuthGuard)
+  async createComment(
+    @Args('input', new InputValidator()) input: CreateCommentInput,
+    @CurrentUser() user: User
+  ) {
+    const _project = await this.projectsService.findOne({
+      _id: new Types.ObjectId(input.project)
+    })
+    if (!_project) {
+      throw new NotFoundError('Project not found')
+    }
+    return this.commentsService.create({
+      content: input.content,
+      rate: input.rate,
+      user: new Types.ObjectId(user.id),
+      project: _project._id
+    })
   }
 
   @Query(() => [Comment], { name: 'comments' })
-  findAll() {
-    return this.commentsService.findAll();
+  async findAll(
+    @Args('filter', new InputValidator()) filter: GetCommentsFilter
+  ) {
+    const _project = await this.projectsService.findOne({
+      _id: new Types.ObjectId(filter.project)
+    })
+    if (!_project) {
+      throw new NotFoundError('Project not found')
+    }
+    return this.commentsService.find({ project: _project._id }, filter)
   }
 
   @Query(() => Comment, { name: 'comment' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.commentsService.findOne(id);
-  }
-
-  @Mutation(() => Comment)
-  updateComment(@Args('updateCommentInput') updateCommentInput: UpdateCommentInput) {
-    return this.commentsService.update(updateCommentInput.id, updateCommentInput);
-  }
-
-  @Mutation(() => Comment)
-  removeComment(@Args('id', { type: () => Int }) id: number) {
-    return this.commentsService.remove(id);
+  async findOne(
+    @Args('filter', new InputValidator()) filter: GetCommentFilter
+  ) {
+    return this.commentsService.findOne({ _id: new Types.ObjectId(filter.id) })
   }
 }

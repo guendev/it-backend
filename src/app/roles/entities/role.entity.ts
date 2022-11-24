@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose'
 import { Field, Float, ID, ObjectType } from '@nestjs/graphql'
 import { Project, ProjectDocument } from '@app/projects/entities/project.entity'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
-import { User, UserDocument } from "@app/users/entities/user.entity";
+import { User, UserDocument } from '@app/users/entities/user.entity'
 
 export type RoleDocument = Role & Document
 

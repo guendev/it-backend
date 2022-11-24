@@ -1,35 +1,78 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { BookmarksService } from './bookmarks.service';
-import { Bookmark } from './entities/bookmark.entity';
-import { CreateBookmarkInput } from './dto/create-bookmark.input';
-import { UpdateBookmarkInput } from './dto/update-bookmark.input';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql'
+import { BookmarksService } from './bookmarks.service'
+import { Bookmark } from './entities/bookmark.entity'
+import { CreateBookmarkInput } from './dto/create-bookmark.input'
+import { UseGuards } from '@nestjs/common'
+import { JWTAuthGuard } from '@guards/jwt.guard'
+import { CurrentUser } from '@decorators/user.decorator'
+import { User, UserDocument } from '@app/users/entities/user.entity'
+import { ProjectsService } from '@app/projects/projects.service'
+import { Types } from 'mongoose'
+import { NotFoundError } from '@shared/errors/not-found.error'
+import { InputValidator } from '@shared/validator/input.validator'
+import { GetBookmarkInput } from '@app/bookmarks/filters/get-bookmark.input'
+import { RemoveBookmarkInput } from '@app/bookmarks/dto/remove-bookmark.input'
 
 @Resolver(() => Bookmark)
 export class BookmarksResolver {
-  constructor(private readonly bookmarksService: BookmarksService) {}
+  constructor(
+    private readonly bookmarksService: BookmarksService,
+    private readonly projectsService: ProjectsService
+  ) {}
 
   @Mutation(() => Bookmark)
-  createBookmark(@Args('createBookmarkInput') createBookmarkInput: CreateBookmarkInput) {
-    return this.bookmarksService.create(createBookmarkInput);
+  @UseGuards(JWTAuthGuard)
+  async createBookmark(
+    @Args('input', new InputValidator()) input: CreateBookmarkInput,
+    @CurrentUser() user: User
+  ) {
+    const _project = await this.projectsService.findOne({
+      _id: new Types.ObjectId(input.project)
+    })
+    if (!_project) {
+      throw new NotFoundError('Project not found')
+    }
+    return this.bookmarksService.create(user as UserDocument, _project)
   }
 
   @Query(() => [Bookmark], { name: 'bookmarks' })
   findAll() {
-    return this.bookmarksService.findAll();
+    return this.bookmarksService.findAll()
   }
 
-  @Query(() => Bookmark, { name: 'bookmark' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.bookmarksService.findOne(id);
+  @Query(() => Bookmark, { name: 'bookmark', nullable: true })
+  @UseGuards(JWTAuthGuard)
+  async findOne(
+    @Args('filter', new InputValidator()) filter: GetBookmarkInput,
+    @CurrentUser() user: User
+  ) {
+    const _project = await this.projectsService.findOne({
+      _id: new Types.ObjectId(filter.project)
+    })
+    if (!_project) {
+      throw new NotFoundError('Project not found')
+    }
+    return this.bookmarksService.findOne({
+      project: _project._id,
+      user: new Types.ObjectId(user.id)
+    })
   }
 
   @Mutation(() => Bookmark)
-  updateBookmark(@Args('updateBookmarkInput') updateBookmarkInput: UpdateBookmarkInput) {
-    return this.bookmarksService.update(updateBookmarkInput.id, updateBookmarkInput);
-  }
-
-  @Mutation(() => Bookmark)
-  removeBookmark(@Args('id', { type: () => Int }) id: number) {
-    return this.bookmarksService.remove(id);
+  @UseGuards(JWTAuthGuard)
+  async removeBookmark(
+    @Args('input', new InputValidator()) input: RemoveBookmarkInput,
+    @CurrentUser() user: User
+  ) {
+    const _project = await this.projectsService.findOne({
+      _id: new Types.ObjectId(input.project)
+    })
+    if (!_project) {
+      throw new NotFoundError('Project not found')
+    }
+    return this.bookmarksService.remove({
+      project: _project._id,
+      user: new Types.ObjectId(user.id)
+    })
   }
 }

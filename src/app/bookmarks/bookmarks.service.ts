@@ -1,26 +1,40 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBookmarkInput } from './dto/create-bookmark.input';
-import { UpdateBookmarkInput } from './dto/update-bookmark.input';
+import { Injectable } from '@nestjs/common'
+import { UpdateBookmarkInput } from './dto/update-bookmark.input'
+import { UserDocument } from '@app/users/entities/user.entity'
+import { ProjectDocument } from '@app/projects/entities/project.entity'
+import { InjectModel } from '@nestjs/mongoose'
+import { FilterQuery, Model } from 'mongoose'
+import {
+  Bookmark,
+  BookmarkDocument
+} from '@app/bookmarks/entities/bookmark.entity'
 
 @Injectable()
 export class BookmarksService {
-  create(createBookmarkInput: CreateBookmarkInput) {
-    return 'This action adds a new bookmark';
+  constructor(
+    @InjectModel(Bookmark.name) private model: Model<BookmarkDocument>
+  ) {}
+
+  async create(
+    user: Pick<UserDocument, '_id'>,
+    project: Pick<ProjectDocument, '_id'>
+  ) {
+    return this.model.create({
+      user: user._id,
+      project: project._id,
+      createdAt: Date.now()
+    })
   }
 
   findAll() {
-    return `This action returns all bookmarks`;
+    return `This action returns all bookmarks`
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} bookmark`;
+  async findOne(filter: FilterQuery<BookmarkDocument>) {
+    return this.model.findOne(filter)
   }
 
-  update(id: number, updateBookmarkInput: UpdateBookmarkInput) {
-    return `This action updates a #${id} bookmark`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} bookmark`;
+  async remove(filter: FilterQuery<BookmarkDocument>) {
+    return this.model.findOneAndDelete(filter)
   }
 }
