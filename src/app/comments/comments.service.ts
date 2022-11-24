@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { FilterQuery, Model } from 'mongoose'
+import { AnyKeys, FilterQuery, Model } from 'mongoose'
 import { Comment, CommentDocument } from '@app/comments/entities/comment.entity'
 import { FilterOffet } from '@shared/args/filter-offset.input'
 
@@ -10,7 +10,7 @@ export class CommentsService {
     @InjectModel(Comment.name) private model: Model<CommentDocument>
   ) {}
 
-  async create(input: Omit<Comment, 'id' | 'createdAt'>) {
+  async create(input: AnyKeys<Comment>) {
     return this.model.create({
       ...input,
       createdAt: Date.now()

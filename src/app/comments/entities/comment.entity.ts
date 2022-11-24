@@ -35,6 +35,10 @@ export class Comment {
   @Prop({ required: true, type: Types.ObjectId, ref: Project.name })
   project: ProjectDocument | Types.ObjectId
 
+  @Field(() => Comment)
+  @Prop({ type: Types.ObjectId, ref: Comment.name })
+  parent: CommentDocument | Types.ObjectId
+
   @Field(() => Number)
   @Prop({ required: true, trim: true })
   createdAt: number

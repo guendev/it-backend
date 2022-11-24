@@ -7,7 +7,7 @@ import { JWTAuthGuard } from '@guards/jwt.guard'
 import { InputValidator } from '@shared/validator/input.validator'
 import { CurrentUser } from '@decorators/user.decorator'
 import { ProjectsService } from '@app/projects/projects.service'
-import { Types } from 'mongoose'
+import { AnyKeys, Types } from 'mongoose'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { User } from '@app/users/entities/user.entity'
 import { GetCommentsFilter } from '@app/comments/filters/get-comments.filter'
@@ -32,12 +32,24 @@ export class CommentsResolver {
     if (!_project) {
       throw new NotFoundError('Project not found')
     }
-    return this.commentsService.create({
+
+    const _doc: AnyKeys<Comment> = {
       content: input.content,
       rate: input.rate,
       user: new Types.ObjectId(user.id),
       project: _project._id
-    })
+    }
+    if (input.parent) {
+      const _parent = await this.commentsService.findOne({
+        _id: new Types.ObjectId(input.parent)
+      })
+      if (!_parent) {
+        throw new NotFoundError('Parent comment not found')
+      }
+      _doc.parent = _parent._id
+    }
+
+    return this.commentsService.create(_doc)
   }
 
   @Query(() => [Comment], { name: 'comments' })
