@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePostInput } from './dto/create-post.input';
-import { UpdatePostInput } from './dto/update-post.input';
+import { Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { AnyKeys, FilterQuery, Model } from 'mongoose'
+import { Post, PostDocument } from '@app/posts/entities/post.entity'
+import { FilterOffet } from '@shared/args/filter-offset.input'
 
 @Injectable()
 export class PostsService {
-  create(createPostInput: CreatePostInput) {
-    return 'This action adds a new post';
+  @InjectModel(Post.name) private model: Model<Post>
+
+  async create(doc: AnyKeys<Post>) {
+    return this.model.create({
+      ...doc,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    })
   }
 
-  findAll() {
-    return `This action returns all posts`;
+  async find(filter: FilterQuery<Post>, options: FilterOffet) {
+    return this.model
+      .find(filter)
+      .sort({ [options.sort]: -1 })
+      .skip(options.offset)
+      .limit(options.limit)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(filter: FilterQuery<Post>) {
+    return this.model.findOne(filter)
   }
 
-  update(id: number, updatePostInput: UpdatePostInput) {
-    return `This action updates a #${id} post`;
+  async update(post: PostDocument, doc: AnyKeys<Post>) {
+    return this.model.findByIdAndUpdate(post.id, doc, { new: true })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(filter: FilterQuery<Post>) {
+    return this.model.findOneAndRemove(filter)
   }
 }
