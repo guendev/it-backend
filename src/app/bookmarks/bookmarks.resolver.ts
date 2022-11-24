@@ -21,7 +21,7 @@ export class BookmarksResolver {
     private readonly projectsService: ProjectsService
   ) {}
 
-  @Mutation(() => Bookmark)
+  @Mutation(() => Bookmark, { nullable: true })
   @UseGuards(JWTAuthGuard)
   async toggleBookmark(
     @Args('input', new InputValidator()) input: CreateBookmarkInput,
@@ -33,6 +33,19 @@ export class BookmarksResolver {
     if (!_project) {
       throw new NotFoundError('Project not found')
     }
+
+    const _record = await this.bookmarksService.findOne({
+      project: _project._id,
+      user: new Types.ObjectId(user.id)
+    })
+
+    if (_record) {
+      return this.bookmarksService.remove({
+        project: _project._id,
+        user: new Types.ObjectId(user.id)
+      })
+    }
+
     return this.bookmarksService.create(user as UserDocument, _project)
   }
 
@@ -67,24 +80,6 @@ export class BookmarksResolver {
       throw new NotFoundError('Project not found')
     }
     return this.bookmarksService.findOne({
-      project: _project._id,
-      user: new Types.ObjectId(user.id)
-    })
-  }
-
-  @Mutation(() => Bookmark)
-  @UseGuards(JWTAuthGuard)
-  async removeBookmark(
-    @Args('input', new InputValidator()) input: RemoveBookmarkInput,
-    @CurrentUser() user: User
-  ) {
-    const _project = await this.projectsService.findOne({
-      _id: new Types.ObjectId(input.project)
-    })
-    if (!_project) {
-      throw new NotFoundError('Project not found')
-    }
-    return this.bookmarksService.remove({
       project: _project._id,
       user: new Types.ObjectId(user.id)
     })
