@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { UpdateBookmarkInput } from './dto/update-bookmark.input'
 import { UserDocument } from '@app/users/entities/user.entity'
 import { ProjectDocument } from '@app/projects/entities/project.entity'
 import { InjectModel } from '@nestjs/mongoose'
@@ -8,6 +7,7 @@ import {
   Bookmark,
   BookmarkDocument
 } from '@app/bookmarks/entities/bookmark.entity'
+import { FilterOffet } from '@shared/args/filter-offset.input'
 
 @Injectable()
 export class BookmarksService {
@@ -26,8 +26,12 @@ export class BookmarksService {
     })
   }
 
-  findAll() {
-    return `This action returns all bookmarks`
+  async find(filter: FilterQuery<BookmarkDocument>, options: FilterOffet) {
+    return this.model
+      .find(filter)
+      .sort({ [options.sort]: -1 })
+      .skip(options.offset)
+      .limit(options.limit)
   }
 
   async findOne(filter: FilterQuery<BookmarkDocument>) {

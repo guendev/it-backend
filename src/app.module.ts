@@ -22,6 +22,7 @@ import { CommentsModule } from './app/comments/comments.module'
 import { ProposalModule } from './app/proposal/proposal.module'
 import { AuthModule } from './app/auth/auth.module';
 import { FirebaseModule } from './app/firebase/firebase.module';
+import { CommentLikesModule } from './app/comment-likes/comment-likes.module';
 
 @Module({
   imports: [
@@ -48,7 +49,8 @@ import { FirebaseModule } from './app/firebase/firebase.module';
     CommentsModule,
     ProposalModule,
     AuthModule,
-    FirebaseModule
+    FirebaseModule,
+    CommentLikesModule
   ],
   controllers: [AppController],
   providers: [AppService, FirebaseStrategy]

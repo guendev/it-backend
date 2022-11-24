@@ -17,6 +17,7 @@ import { ProjectsModule } from '@app/projects/projects.module'
     ]),
     forwardRef(() => ProjectsModule)
   ],
-  providers: [CommentsResolver, CommentsService]
+  providers: [CommentsResolver, CommentsService],
+  exports: [CommentsService]
 })
 export class CommentsModule {}

@@ -12,6 +12,7 @@ import { NotFoundError } from '@shared/errors/not-found.error'
 import { InputValidator } from '@shared/validator/input.validator'
 import { GetBookmarkInput } from '@app/bookmarks/filters/get-bookmark.input'
 import { RemoveBookmarkInput } from '@app/bookmarks/dto/remove-bookmark.input'
+import { GetBookmarksInput } from '@app/bookmarks/filters/get-bookmarks.input'
 
 @Resolver(() => Bookmark)
 export class BookmarksResolver {
@@ -22,7 +23,7 @@ export class BookmarksResolver {
 
   @Mutation(() => Bookmark)
   @UseGuards(JWTAuthGuard)
-  async createBookmark(
+  async toggleBookmark(
     @Args('input', new InputValidator()) input: CreateBookmarkInput,
     @CurrentUser() user: User
   ) {
@@ -36,8 +37,21 @@ export class BookmarksResolver {
   }
 
   @Query(() => [Bookmark], { name: 'bookmarks' })
-  findAll() {
-    return this.bookmarksService.findAll()
+  @UseGuards(JWTAuthGuard)
+  async find(
+    @Args('filter', new InputValidator()) filter: GetBookmarksInput,
+    @CurrentUser() user: User
+  ) {
+    const _project = await this.projectsService.findOne({
+      _id: new Types.ObjectId(filter.project)
+    })
+    if (!_project) {
+      throw new NotFoundError('Project not found')
+    }
+    return this.bookmarksService.find(
+      { project: _project._id, user: new Types.ObjectId(user.id) },
+      filter
+    )
   }
 
   @Query(() => Bookmark, { name: 'bookmark', nullable: true })
