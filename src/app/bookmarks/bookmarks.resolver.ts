@@ -11,7 +11,6 @@ import { Types } from 'mongoose'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { InputValidator } from '@shared/validator/input.validator'
 import { GetBookmarkInput } from '@app/bookmarks/filters/get-bookmark.input'
-import { RemoveBookmarkInput } from '@app/bookmarks/dto/remove-bookmark.input'
 import { GetBookmarksInput } from '@app/bookmarks/filters/get-bookmarks.input'
 
 @Resolver(() => Bookmark)
