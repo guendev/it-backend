@@ -35,7 +35,7 @@ export class Comment {
   @Prop({ required: true, type: Types.ObjectId, ref: Project.name })
   project: ProjectDocument | Types.ObjectId
 
-  @Field(() => Comment)
+  @Field(() => Comment, { nullable: true })
   @Prop({ type: Types.ObjectId, ref: Comment.name })
   parent: CommentDocument | Types.ObjectId
 
