@@ -23,7 +23,7 @@ import {
   GetProjectsFilter
 } from '@app/projects/filters/get-projects.filter'
 import { ProjectActive } from '@app/projects/enums/project.active.enum'
-import { UseGuards } from '@nestjs/common'
+import { Inject, UseGuards } from '@nestjs/common'
 import { CurrentUser } from '@decorators/user.decorator'
 import { UsersService } from '@app/users/users.service'
 import { RolesService } from '@app/roles/roles.service'
@@ -33,8 +33,11 @@ import { StudioCountProjectsFilter } from '@app/projects/filters/count-projects.
 import { GetProjectFilter } from '@app/projects/filters/get-project.filter'
 import { ApproveProjectInput } from '@app/projects/dto/approve-project.input'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
-import { UserRole } from '@app/users/enum/role.enum'
 import { JWTAuthGuard } from '../../guards/jwt.guard'
+import { TechnologyDocument } from '@app/technologies/entities/technology.entity'
+import { PUB_SUB } from '@apollo/pubsub.module'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import ChanelEnum from '@apollo/chanel.enum'
 
 @Resolver(() => Project)
 export class ProjectsResolver {
@@ -44,7 +47,8 @@ export class ProjectsResolver {
     private readonly technologiesService: TechnologiesService,
     private readonly stepsService: StepService,
     private readonly usersService: UsersService,
-    private readonly rolesService: RolesService
+    private readonly rolesService: RolesService,
+    @Inject(PUB_SUB) private pubSub: RedisPubSub
   ) {}
 
   @Mutation(() => Project)
@@ -57,6 +61,9 @@ export class ProjectsResolver {
       this.getCategory(input.category),
       this.getTechs(input.technologies)
     ])
+    await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      subNotify: { user, msg: 'Tạo thành công' }
+    })
     return this.projectsService.create(user, {
       ...input,
       technologies: technologies.map((technology) => technology._id),
@@ -117,7 +124,9 @@ export class ProjectsResolver {
       this.getCategory(input.category),
       this.getTechs(input.technologies)
     ])
-
+    await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      subNotify: { user, msg: 'Cập nhật thành công' }
+    })
     return this.projectsService.update(_project, {
       ...input,
       technologies: technologies.map((technology) => technology._id),
@@ -284,12 +293,50 @@ export class ProjectsResolver {
     return category
   }
 
-  async getTechs(_ids: (string | Types.ObjectId)[]) {
-    return this.technologiesService.find({
-      _id: {
-        $in: _ids.map((id) => new Types.ObjectId(id))
-      }
-    })
+  async getTechs(_ids: string[]): Promise<TechnologyDocument[]> {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return Promise.all(
+      _ids.map(
+        (_id) =>
+          new Promise((resolve, reject) => {
+            if (Types.ObjectId.isValid(_id)) {
+              this.technologiesService
+                .findOne({ _id: new Types.ObjectId(_id) })
+                .then((technology) => {
+                  if (technology) {
+                    resolve(technology)
+                  } else {
+                    reject(new Error('Technology not found'))
+                  }
+                })
+                .catch(reject)
+            } else {
+              this.technologiesService
+                .findOne({
+                  name: {
+                    $regex: new RegExp(`^${_id}$`, 'i')
+                  }
+                })
+                .then((record) => {
+                  if (record) {
+                    resolve(record)
+                  } else {
+                    this.technologiesService
+                      .create({ name: _id })
+                      .then((record) => {
+                        if (record) {
+                          resolve(record)
+                        }
+                      })
+                      .catch(reject)
+                  }
+                })
+                .catch(reject)
+            }
+          })
+      )
+    )
   }
 
   getBasicFilter(

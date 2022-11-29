@@ -34,11 +34,10 @@ export class CreateProjectInput {
   @IsObjectID()
   category: Types.ObjectId
 
-  @Field(() => [ID], { nullable: true, defaultValue: [] })
+  @Field(() => [String], { nullable: true, defaultValue: [] })
   @IsArray()
   @ArrayMinSize(1)
-  @IsObjectID({ each: true })
-  technologies: Types.ObjectId[]
+  technologies: string[]
 
   @Field(() => [Float, Float])
   @IsArray()

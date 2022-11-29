@@ -6,7 +6,7 @@ import { FilterOffet } from '@shared/args/filter-offset.input'
 
 @Injectable()
 export class PostsService {
-  @InjectModel(Post.name) private model: Model<Post>
+  @InjectModel(Post.name) private model: Model<PostDocument>
 
   async create(doc: AnyKeys<Post>) {
     return this.model.create({

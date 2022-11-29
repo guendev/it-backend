@@ -19,6 +19,12 @@ import { RemoveRoleInput } from '@app/roles/dto/remove-role.input'
 import { GetRolesInput } from '@app/roles/dto/get-roles.input'
 import { UsersService } from '@app/users/users.service'
 import { EventEmitter2 } from '@nestjs/event-emitter'
+import ChanelEnum from '@apollo/chanel.enum'
+import { Inject, UseGuards } from '@nestjs/common'
+import { JWTAuthGuard } from '@guards/jwt.guard'
+import { CurrentUser } from '@decorators/user.decorator'
+import { PUB_SUB } from '@apollo/pubsub.module'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
 
 @Resolver(() => Role)
 export class RolesResolver {
@@ -26,12 +32,15 @@ export class RolesResolver {
     private readonly rolesService: RolesService,
     private readonly usersService: UsersService,
     private readonly projectsService: ProjectsService,
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
+    @Inject(PUB_SUB) private pubSub: RedisPubSub
   ) {}
 
   @Mutation(() => Role)
+  @UseGuards(JWTAuthGuard)
   async createRole(
-    @Args('input', new InputValidator()) input: CreateRoleInput
+    @Args('input', new InputValidator()) input: CreateRoleInput,
+    @CurrentUser() user
   ) {
     const _project = await this.projectsService.findOne({
       _id: new Types.ObjectId(input.project)
@@ -43,6 +52,10 @@ export class RolesResolver {
 
     const roles = await this.rolesService.find({
       project: new Types.ObjectId(input.project)
+    })
+
+    await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      subNotify: { user, msg: 'Tạo thành công' }
     })
 
     return this.rolesService.create({
@@ -64,8 +77,10 @@ export class RolesResolver {
   }
 
   @Mutation(() => Role)
+  @UseGuards(JWTAuthGuard)
   async updateRole(
-    @Args('input', new InputValidator()) input: UpdateRoleInput
+    @Args('input', new InputValidator()) input: UpdateRoleInput,
+    @CurrentUser() user
   ) {
     /// dfd
     const _role = await this.rolesService.findOne({
@@ -77,6 +92,10 @@ export class RolesResolver {
     ///fdsfsd
     // Todo: check permission
     delete input.id
+
+    await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      subNotify: { user, msg: 'Cập nhật thành công' }
+    })
     ///fdsfdsf
     return this.rolesService.update(_role, input)
   }
@@ -114,8 +133,10 @@ export class RolesResolver {
   }
 
   @Mutation(() => Role)
+  @UseGuards(JWTAuthGuard)
   async removeRole(
-    @Args('input', new InputValidator()) input: RemoveRoleInput
+    @Args('input', new InputValidator()) input: RemoveRoleInput,
+    @CurrentUser() user
   ) {
     const _role = await this.rolesService.findOne({
       _id: new Types.ObjectId(input.id)
@@ -124,6 +145,9 @@ export class RolesResolver {
       throw new NotFoundError('Role không tồn tại')
     }
     // Todo: check permission
+    await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      subNotify: { user, msg: 'Xoá thành công' }
+    })
     return this.rolesService.remove(_role)
   }
 
