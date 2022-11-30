@@ -33,7 +33,7 @@ import { StudioCountProjectsFilter } from '@app/projects/filters/count-projects.
 import { GetProjectFilter } from '@app/projects/filters/get-project.filter'
 import { ApproveProjectInput } from '@app/projects/dto/approve-project.input'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
-import { JWTAuthGuard } from '../../guards/jwt.guard'
+import { JWTAuthGuard } from '@guards/jwt.guard'
 import { TechnologyDocument } from '@app/technologies/entities/technology.entity'
 import { PUB_SUB } from '@apollo/pubsub.module'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
@@ -159,6 +159,10 @@ export class ProjectsResolver {
       })
       if (!_role) throw new NotFoundError('Permission denied')
     }
+
+    await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      subNotify: { user, msg: 'Xoá thành công' }
+    })
 
     return this.projectsService.remove(_project)
   }
