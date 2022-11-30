@@ -45,7 +45,7 @@ export class Role {
   // Người được phân quyền
   @Field(() => User, { nullable: true })
   @Prop({ type: Types.ObjectId, index: true })
-  user: UserDocument
+  user: UserDocument | Types.ObjectId
 
   @Field(() => Float)
   @Prop({ type: Number, index: true })

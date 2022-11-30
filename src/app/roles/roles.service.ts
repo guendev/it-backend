@@ -1,16 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { UpdateRoleInput } from './dto/update-role.input'
 import { InjectModel } from '@nestjs/mongoose'
-import { FilterQuery, Model } from 'mongoose'
+import { AnyKeys, FilterQuery, Model } from 'mongoose'
 import { Role, RoleDocument } from '@app/roles/entities/role.entity'
 
 @Injectable()
 export class RolesService {
   constructor(@InjectModel(Role.name) private model: Model<RoleDocument>) {}
 
-  async create(
-    input: Pick<Role, 'name' | 'permissions' | 'order' | 'project'>
-  ) {
+  async create(input: AnyKeys<Role>) {
     return this.model.create({
       ...input,
       createdAt: Date.now(),
