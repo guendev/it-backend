@@ -118,6 +118,7 @@ export class RolesResolver {
     ///fdsfsd
     // Todo: check permission
     // Todo: check lại role này có user chưa
+    // Todo: User ko dc phép điền trường user
 
     await this.pubSub.publish(ChanelEnum.NOTIFY, {
       subNotify: { user, msg: 'Cập nhật thành công' }
