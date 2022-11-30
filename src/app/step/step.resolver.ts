@@ -8,26 +8,32 @@ import { ProjectsService } from '@app/projects/projects.service'
 import { Types } from 'mongoose'
 import { NotFoundError } from '@shared/errors/not-found.error'
 import { RemoveStepInput } from '@app/step/dto/remove-step.input'
-import { UseGuards } from '@nestjs/common'
+import { Inject, UseGuards } from '@nestjs/common'
 import { FirebaseGuard } from '../../guards/firebase.guard'
 import { GetStepsFilter } from '@app/step/filters/get-steps.filter'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { SortStepsInput } from '@app/step/dto/sort-steps.input'
 import { StepStatus } from '@app/step/enums/step.status.enum'
-import { JWTAuthGuard } from "../../guards/jwt.guard";
+import { JWTAuthGuard } from '../../guards/jwt.guard'
+import { PUB_SUB } from '@apollo/pubsub.module'
+import { RedisPubSub } from 'graphql-redis-subscriptions'
+import ChanelEnum from '@apollo/chanel.enum'
+import { CurrentUser } from "@decorators/user.decorator";
 
 @Resolver(() => Step)
 export class StepResolver {
   constructor(
     private readonly stepService: StepService,
     private readonly projectService: ProjectsService,
-    private readonly eventEmitter: EventEmitter2
+    private readonly eventEmitter: EventEmitter2,
+    @Inject(PUB_SUB) private pubSub: RedisPubSub
   ) {}
 
   @Mutation(() => Step)
   @UseGuards(JWTAuthGuard)
   async createStep(
-    @Args('input', new InputValidator()) input: CreateStepInput
+    @Args('input', new InputValidator()) input: CreateStepInput,
+    @CurrentUser() user
   ) {
     // Todo: check permission
     const _project = await this.projectService.findOne({
@@ -41,6 +47,10 @@ export class StepResolver {
       project: new Types.ObjectId(input.project)
     })
     const _order = _steps.sort((a, b) => b.order - a.order)[0]?.order || 0
+
+    await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      subNotify: { user, msg: 'Thêm thành công' }
+    })
 
     return this.stepService.create({
       ...input,
