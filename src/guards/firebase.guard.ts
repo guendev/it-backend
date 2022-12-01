@@ -39,6 +39,9 @@ export class FirebaseGuard extends AuthGuard('firebase-auth') {
           authorization: ctx._token
         }
       }
+
+    console.log(ctx.req)
+
     return ctx.req
   }
 
