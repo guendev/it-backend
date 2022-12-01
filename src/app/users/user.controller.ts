@@ -15,11 +15,15 @@ export class UserController {
   ) {}
 
   @Post('auth')
-  @UseGuards(FirebaseGuard)
-  async auth(@CurrentUser() user: User) {
-    const token = await this.authService.JWTGenerator(user)
+  // @UseGuards(FirebaseGuard)
+  async auth() {
+    // @CurrentUser() user: User
+    // const token = await this.authService.JWTGenerator(user)
+    // return {
+    //   token
+    // }
     return {
-      token
+      token: 123
     }
   }
 
