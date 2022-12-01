@@ -40,8 +40,6 @@ export class FirebaseGuard extends AuthGuard('firebase-auth') {
         }
       }
 
-    console.log(ctx.req)
-
     return ctx.req
   }
 
