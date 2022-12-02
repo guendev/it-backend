@@ -177,6 +177,10 @@ export class ProposalResolver {
       throw new ForbiddenError('User already has role')
     }
 
+    await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      subNotify: { user, msg: 'Cập nhật thành công' }
+    })
+
     // Người kiểm duyệt chỉ dc phép duyệt hoặc từ chối
     return this.proposalService.update(_proposal, {
       note: input.note,

@@ -44,8 +44,10 @@ input ApproveProjectInput {
 }
 
 type Bookmark {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  createdAt: Float!
+  id: ID!
+  project: Project!
+  user: User!
 }
 
 type Category {
@@ -57,18 +59,29 @@ type Category {
 
 input CheckProposalInput {
   id: ID!
-  note: String!
+  note: String = ""
   status: ProposalStatus!
 }
 
 type Comment {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  content: String!
+  createdAt: Float!
+  id: ID!
+  parent: Comment
+  project: Project!
+  rate: Int!
+  user: User!
+}
+
+type CommentLike {
+  comment: Project!
+  createdAt: Float!
+  id: ID!
+  user: User!
 }
 
 input CreateBookmarkInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  project: ID!
 }
 
 input CreateCategoryInput {
@@ -77,8 +90,19 @@ input CreateCategoryInput {
 }
 
 input CreateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  content: String!
+  parent: ID
+  project: ID!
+  rate: Float!
+}
+
+input CreateCommentLikeInput {
+  comment: ID!
+}
+
+input CreatePostInput {
+  content: String!
+  tags: [String!] = []
 }
 
 input CreateProjectInput {
@@ -91,7 +115,7 @@ input CreateProjectInput {
   logo: String = ""
   name: String!
   status: ProjectStatus = PREPARE
-  technologies: [ID!] = []
+  technologies: [String!] = []
 }
 
 input CreateProposalInput {
@@ -134,6 +158,36 @@ input ExampleProjectsFilter {
   technologies: [ID!]
 }
 
+input GetBookmarkInput {
+  project: ID!
+}
+
+input GetBookmarksInput {
+  limit: Int!
+  offset: Int!
+  project: ID!
+
+  """Sắp xếp của bình luận"""
+  sort: String!
+}
+
+input GetCommentFilter {
+  id: ID!
+}
+
+input GetCommentLikeFilter {
+  comment: ID!
+}
+
+input GetCommentsFilter {
+  limit: Int!
+  offset: Int!
+  project: ID!
+
+  """Sắp xếp của bình luận"""
+  sort: String!
+}
+
 input GetMyProjectsFilter {
   active: [ProjectActive!] = []
   category: ID
@@ -145,6 +199,18 @@ input GetMyProjectsFilter {
   sort: String!
   status: ProjectStatus
   technologies: [ID!]
+}
+
+input GetPostFilter {
+  id: ID!
+}
+
+input GetPostsFilter {
+  limit: Int!
+  offset: Int!
+
+  """Sắp xếp của bình luận"""
+  sort: String!
 }
 
 input GetProjectFilter {
@@ -197,17 +263,16 @@ input GetUsersFilter {
 
 type Mutation {
   checkProposal(input: CheckProposalInput!): Proposal!
-  createBookmark(createBookmarkInput: CreateBookmarkInput!): Bookmark!
   createCategory(input: CreateCategoryInput!): Category!
-  createComment(createCommentInput: CreateCommentInput!): Comment!
+  createComment(input: CreateCommentInput!): Comment!
+  createPost(input: CreatePostInput!): Post!
   createProject(input: CreateProjectInput!): Project!
   createProposal(input: CreateProposalInput!): Proposal!
   createRole(input: CreateRoleInput!): Role!
   createStep(input: CreateStepInput!): Step!
   createTechnology(input: CreateTechnologyInput!): Technology!
-  removeBookmark(id: Int!): Bookmark!
   removeCategory(input: DeleteCategoryInput!): Category!
-  removeComment(id: Int!): Comment!
+  removePost(input: RemovePostInput!): Post!
   removeProject(input: RemoveProjectInput!): Project!
   removeProposal(input: RemoveProposalInput!): Proposal!
   removeRole(input: RemoveRoleInput!): Role!
@@ -216,9 +281,10 @@ type Mutation {
   sortRoles(input: SortRolesInput!): [Role!]!
   sortSteps(input: SortStepsInput!): [Step!]!
   studioProjectApprove(input: ApproveProjectInput!): Project!
-  updateBookmark(updateBookmarkInput: UpdateBookmarkInput!): Bookmark!
+  toggleBookmark(input: CreateBookmarkInput!): Bookmark
+  toggleCommentLike(input: CreateCommentLikeInput!): CommentLike
   updateCategory(input: UpdateCategoryInput!): Category!
-  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
+  updatePost(input: UpdatePostInput!): Post!
   updateProject(input: UpdateProjectInput!): Project!
   updateProposal(input: UpdateProposalInput!): Proposal!
   updateRole(input: UpdateRoleInput!): Role!
@@ -243,6 +309,15 @@ enum PermissionEnum {
   REMOVE_ROLE
   UPDATE_PROJECT
   UPDATE_ROLE
+}
+
+type Post {
+  content: String!
+  createdAt: Float!
+  id: ID!
+  tags: [String!]!
+  updatedAt: Float!
+  user: User!
 }
 
 type Project {
@@ -301,14 +376,17 @@ enum ProposalStatus {
 }
 
 type Query {
-  bookmark(id: Int!): Bookmark!
-  bookmarks: [Bookmark!]!
+  bookmark(filter: GetBookmarkInput!): Bookmark
+  bookmarks(filter: GetBookmarksInput!): [Bookmark!]!
   categories: [Category!]!
   category(category: String!): Category!
-  comment(id: Int!): Comment!
-  comments: [Comment!]!
+  comment(filter: GetCommentFilter!): Comment!
+  commentLike(filter: GetCommentLikeFilter!): CommentLike
+  comments(filter: GetCommentsFilter!): [Comment!]!
   exampleProjects(filter: ExampleProjectsFilter!): [Project!]!
   me: User!
+  post(filter: GetPostFilter!): Post!
+  posts(filter: GetPostsFilter!): [Post!]!
   project(project: String!): Project!
   projects(filter: GetProjectsFilter!): [Project!]!
   proposal(filter: GetProposalFilter!): Proposal
@@ -321,6 +399,10 @@ type Query {
   technologies(filter: GetTechnologiesFilter!): [Technology!]!
   technology(id: Int!): Technology!
   users(filter: GetUsersFilter!): [User!]!
+}
+
+input RemovePostInput {
+  id: ID!
 }
 
 input RemoveProjectInput {
@@ -398,22 +480,16 @@ type Technology {
   slug: String!
 }
 
-input UpdateBookmarkInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
-}
-
 input UpdateCategoryInput {
   content: String = ""
   id: ID!
   name: String
 }
 
-input UpdateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+input UpdatePostInput {
+  content: String
+  id: ID!
+  tags: [String!] = []
 }
 
 input UpdateProjectInput {
@@ -427,7 +503,7 @@ input UpdateProjectInput {
   logo: String = ""
   name: String
   status: ProjectStatus = PREPARE
-  technologies: [ID!] = []
+  technologies: [String!] = []
 }
 
 input UpdateProposalInput {
