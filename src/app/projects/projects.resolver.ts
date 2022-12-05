@@ -29,7 +29,7 @@ import { UsersService } from '@app/users/users.service'
 import { RolesService } from '@app/roles/roles.service'
 import { ProjectStatus } from '@app/projects/enums/project.status.enum'
 import { ExampleProjectsFilter } from '@app/projects/filters/example-projects.filter'
-import { StudioCountProjectsFilter } from '@app/projects/filters/count-projects.filter'
+import { CountProjectsFilter, StudioCountProjectsFilter } from "@app/projects/filters/count-projects.filter";
 import { GetProjectFilter } from '@app/projects/filters/get-project.filter'
 import { ApproveProjectInput } from '@app/projects/dto/approve-project.input'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
@@ -76,6 +76,15 @@ export class ProjectsResolver {
     const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
     _filter.active = ProjectActive.ACTIVE
     return this.projectsService.find(_filter, filter)
+  }
+
+  @Query(() => Int)
+  async projectsCount(
+    @Args('filter', new InputValidator()) filter: CountProjectsFilter
+  ) {
+    const _filter: FilterQuery<ProjectDocument> = this.getBasicFilter(filter)
+    _filter.active = ProjectActive.ACTIVE
+    return this.projectsService.count(_filter)
   }
 
   @Query(() => [Project])
