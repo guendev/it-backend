@@ -82,6 +82,10 @@ export class Project {
   @Prop({ type: String })
   link: string
 
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  @Prop({ type: Boolean, index: true, default: false })
+  enterprise: boolean
+
   @Field(() => [String])
   @Prop({ type: [String] })
   files: string[]
