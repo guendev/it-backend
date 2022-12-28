@@ -61,6 +61,10 @@ export class CreateProjectInput {
   @ArrayMinSize(0)
   files: string[]
 
+  @Field(() => Boolean, { defaultValue: false })
+  @IsOptional()
+  enterprise: boolean
+
   @Field(() => ProjectStatus, {
     defaultValue: ProjectStatus.PREPARE,
     nullable: true

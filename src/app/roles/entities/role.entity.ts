@@ -51,6 +51,15 @@ export class Role {
   @Prop({ type: Number, index: true })
   order: number
 
+  /**
+   * the group field is created automatically on server every time a new role is created
+   * roles create at the same time will have the same group
+   * if adjust the role, the group will be changed
+   */
+  @Field(() => String, { nullable: true })
+  @Prop({ type: String, index: true })
+  group: string
+
   @Field(() => Float)
   @Prop({ required: true, type: Number, index: true })
   createdAt: number

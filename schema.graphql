@@ -80,6 +80,13 @@ type CommentLike {
   user: User!
 }
 
+input CountProjectsFilter {
+  category: ID
+  name: String
+  status: ProjectStatus
+  technologies: [ID!]
+}
+
 input CreateBookmarkInput {
   project: ID!
 }
@@ -109,6 +116,7 @@ input CreateProjectInput {
   category: ID!
   content: String = ""
   cover: String!
+  enterprise: Boolean = false
   estimate: [Float!]!
   files: [ID!] = []
   link: String = ""
@@ -328,6 +336,7 @@ type Project {
   content: String
   cover: String!
   createdAt: Float!
+  enterprise: Boolean
   estimate: [Float!]!
   files: [String!]!
   id: ID!
@@ -389,6 +398,7 @@ type Query {
   posts(filter: GetPostsFilter!): [Post!]!
   project(project: String!): Project!
   projects(filter: GetProjectsFilter!): [Project!]!
+  projectsCount(filter: CountProjectsFilter!): Int!
   proposal(filter: GetProposalFilter!): Proposal
   proposals(filter: GetProposalsFilter!): [Proposal!]!
   roles(filter: GetRolesInput!): [Role!]!
@@ -496,6 +506,7 @@ input UpdateProjectInput {
   category: ID
   content: String = ""
   cover: String
+  enterprise: Boolean = false
   estimate: [Float!]
   files: [ID!] = []
   id: ID!

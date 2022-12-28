@@ -1,5 +1,5 @@
-import { InputType, Field, ID } from '@nestjs/graphql'
-import { IsArray, IsNotEmpty, IsOptional, MinLength } from 'class-validator'
+import { InputType, Field, ID, Int } from "@nestjs/graphql";
+import { IsArray, IsNotEmpty, IsNumber, Min, MinLength } from "class-validator";
 import { IsObjectID } from '@shared/validator/objectid.validator'
 import { Types } from 'mongoose'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
@@ -22,8 +22,11 @@ export class CreateRoleInput {
   @IsArray()
   permissions: PermissionEnum[]
 
-  @Field(() => ID, { nullable: true })
-  @IsOptional()
-  @IsObjectID()
-  user: Types.ObjectId
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  content: string
+
+  @Field(() => Int, { nullable: true, defaultValue: 1 })
+  @IsNumber()
+  @Min(1)
+  count: number
 }
