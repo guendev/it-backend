@@ -60,6 +60,10 @@ export class Role {
   @Prop({ type: String, index: true })
   group: string
 
+  @Field(() => String, { nullable: true })
+  @Prop({ type: String, index: true })
+  content: string
+
   @Field(() => Float)
   @Prop({ required: true, type: Number, index: true })
   createdAt: number

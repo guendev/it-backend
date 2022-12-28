@@ -1,5 +1,5 @@
-import { InputType, Field, ID, Int } from "@nestjs/graphql";
-import { IsArray, IsNotEmpty, IsNumber, Min, MinLength } from "class-validator";
+import { InputType, Field, ID, Int } from '@nestjs/graphql'
+import { IsArray, IsNotEmpty, IsNumber, Min, MinLength } from 'class-validator'
 import { IsObjectID } from '@shared/validator/objectid.validator'
 import { Types } from 'mongoose'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
