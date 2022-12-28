@@ -56,9 +56,9 @@ export class Role {
    * roles create at the same time will have the same group
    * if adjust the role, the group will be changed
    */
-  @Field(() => String, { nullable: true })
-  @Prop({ type: String, index: true })
-  group: string
+  @Field(() => Float, { nullable: true })
+  @Prop({ type: Number, index: true })
+  group: number
 
   @Field(() => String, { nullable: true })
   @Prop({ type: String, index: true })

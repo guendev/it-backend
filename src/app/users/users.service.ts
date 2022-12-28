@@ -16,6 +16,7 @@ export class UsersService {
     this.logger.log(`Creating a new user: ${user.displayName}`)
     return this.userModel.create({
       name: user.displayName || 'Anonymous',
+      email: user.email,
       uid: user.uid,
       createdAt: Date.now()
     })

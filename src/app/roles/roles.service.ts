@@ -8,7 +8,16 @@ import { Role, RoleDocument } from '@app/roles/entities/role.entity'
 export class RolesService {
   constructor(@InjectModel(Role.name) private model: Model<RoleDocument>) {}
 
-  async create(input: AnyKeys<Role>) {
+  async create(input: AnyKeys<Role> | AnyKeys<Role>[]) {
+    if (Array.isArray(input)) {
+      return this.model.insertMany(
+        input.map((item) => ({
+          ...item,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        }))
+      )
+    }
     return this.model.create({
       ...input,
       createdAt: Date.now(),
@@ -24,7 +33,7 @@ export class RolesService {
     return this.model.findOne(filter)
   }
 
-  async update(role: RoleDocument, doc: Omit<UpdateRoleInput, 'id'>) {
+  async update(role: RoleDocument, doc: Omit<AnyKeys<Role>, 'id'>) {
     return this.model.findByIdAndUpdate(
       role._id,
       {

@@ -28,9 +28,13 @@ export class User {
   })
   uid: string
 
-  @Prop({ required: true })
+  @Prop({ required: true, index: true })
   @Field(() => String)
   name: string
+
+  @Prop({ index: true })
+  @Field(() => String, { nullable: true })
+  email: string
 
   @Prop({ slug: 'name', unique: true, index: true })
   @Field(() => String)

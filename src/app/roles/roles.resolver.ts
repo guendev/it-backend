@@ -25,7 +25,6 @@ import { JWTAuthGuard } from '@guards/jwt.guard'
 import { CurrentUser } from '@decorators/user.decorator'
 import { PUB_SUB } from '@apollo/pubsub.module'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
-import { ForbiddenError } from 'apollo-server-express'
 
 @Resolver(() => Role)
 export class RolesResolver {
@@ -37,7 +36,7 @@ export class RolesResolver {
     @Inject(PUB_SUB) private pubSub: RedisPubSub
   ) {}
 
-  @Mutation(() => Role)
+  @Mutation(() => [Role])
   @UseGuards(JWTAuthGuard)
   async createRole(
     @Args('input', new InputValidator()) input: CreateRoleInput,
@@ -50,40 +49,28 @@ export class RolesResolver {
       throw new NotFoundError('Project không tồn tại')
     }
 
-    const doc: AnyKeys<Role> = {
-      project: _project._id,
-      name: input.name,
-      permissions: input.permissions
-    }
-
     // Todo: check permission
 
     const roles = await this.rolesService.find({
       project: new Types.ObjectId(input.project)
     })
-    doc.order = roles.length + 1
 
-    //  check user is exist
-    if (input.user) {
-      const _user = await this.usersService.findOne({
-        _id: new Types.ObjectId(input.user)
+    const inputs: AnyKeys<Role>[] = Array(input.count)
+      .fill({
+        project: _project._id,
+        name: input.name,
+        permissions: input.permissions,
+        group: Math.round(Math.random() * 10000000)
       })
-      if (!_user) {
-        throw new NotFoundError('User không tồn tại')
-      }
-      // xem user có trong roles này chưa
-      const _index = roles.findIndex((role) => role.user === _user._id)
-      if (_index !== -1) {
-        throw new ForbiddenError('User đã có trong role này')
-      }
-      doc.user = _user._id
-    }
+      .map((item, index) => ({
+        ...item,
+        order: roles.length + index + 1
+      }))
 
     await this.pubSub.publish(ChanelEnum.NOTIFY, {
       subNotify: { user, msg: 'Tạo thành công' }
     })
-
-    return this.rolesService.create(doc)
+    return this.rolesService.create(inputs)
   }
 
   @Query(() => [Role], { name: 'roles' })
@@ -103,6 +90,18 @@ export class RolesResolver {
     @Args('input', new InputValidator()) input: UpdateRoleInput,
     @CurrentUser() user
   ) {
+    const getInput = <T extends Record<string, any>>(
+      input: T,
+      exclude: (keyof T)[]
+    ) => {
+      return Object.entries(input).reduce((acc, [key, value]) => {
+        if (value && !exclude.includes(key as keyof T)) {
+          acc[key] = value
+        }
+        return acc
+      }, {} as any)
+    }
+
     /// dfd
     const _role = await this.rolesService.findOne({
       _id: new Types.ObjectId(input.id)
@@ -111,20 +110,29 @@ export class RolesResolver {
       throw new NotFoundError('Role không tồn tại')
     }
 
-    const doc: AnyKeys<Role> = {
-      name: input.name,
-      permissions: input.permissions
+    const doc: AnyKeys<Role> = getInput(input, ['id', 'user'])
+
+    if (input.user) {
+      const _user = await this.usersService.findOne({
+        _id: new Types.ObjectId(input.user)
+      })
+      if (!_user) {
+        throw new NotFoundError('User không tồn tại')
+      }
+      doc.user = _user._id
     }
+
     ///fdsfsd
     // Todo: check permission
     // Todo: check lại role này có user chưa
     // Todo: User ko dc phép điền trường user
+    doc.group = Math.round(Math.random() * 10000000)
 
     await this.pubSub.publish(ChanelEnum.NOTIFY, {
       subNotify: { user, msg: 'Cập nhật thành công' }
     })
     ///fdsfdsf
-    return this.rolesService.update(_role, input)
+    return this.rolesService.update(_role, doc)
   }
 
   @Mutation(() => [Role])

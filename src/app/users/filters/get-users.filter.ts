@@ -9,6 +9,10 @@ export class GetUsersFilter extends FilterOffet {
   @IsOptional()
   name?: string
 
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  email?: string
+
   @Field(() => [ID], { nullable: true, defaultValue: [] })
   @IsOptional()
   @IsArray()

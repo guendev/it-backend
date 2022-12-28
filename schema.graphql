@@ -133,12 +133,13 @@ input CreateProposalInput {
 }
 
 input CreateRoleInput {
+  content: String = ""
+  count: Int = 1
   name: String!
 
   """Mảng các quyền...mảng giao động từ 1"""
   permissions: [PermissionEnum!]!
   project: ID!
-  user: ID
 }
 
 input CreateStepInput {
@@ -260,6 +261,7 @@ input GetTechnologiesFilter {
 }
 
 input GetUsersFilter {
+  email: String
   exclude: [ID!] = []
   limit: Int!
   name: String
@@ -276,7 +278,7 @@ type Mutation {
   createPost(input: CreatePostInput!): Post!
   createProject(input: CreateProjectInput!): Project!
   createProposal(input: CreateProposalInput!): Proposal!
-  createRole(input: CreateRoleInput!): Role!
+  createRole(input: CreateRoleInput!): [Role!]!
   createStep(input: CreateStepInput!): Step!
   createTechnology(input: CreateTechnologyInput!): Technology!
   removeCategory(input: DeleteCategoryInput!): Category!
@@ -436,7 +438,9 @@ input RemoveTechnologyInput {
 }
 
 type Role {
+  content: String
   createdAt: Float!
+  group: Float
   id: ID!
   name: String!
   order: Float!
@@ -525,12 +529,13 @@ input UpdateProposalInput {
 }
 
 input UpdateRoleInput {
+  content: String = ""
   id: ID!
   name: String
 
   """Mảng các quyền...mảng giao động từ 1"""
   permissions: [PermissionEnum!]
-  user: ID
+  user: ID!
 }
 
 input UpdateStepInput {
@@ -549,6 +554,7 @@ input UpdateTechnologyInput {
 type User {
   avatar: String
   createdAt: Float!
+  email: String
   id: ID!
   name: String!
   role: UserRole!
