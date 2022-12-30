@@ -33,7 +33,7 @@ export class RolesService {
     return this.model.findOne(filter)
   }
 
-  async update(role: RoleDocument, doc: Omit<AnyKeys<Role>, 'id'>) {
+  async update(role: Pick<RoleDocument, "_id">, doc: Omit<AnyKeys<Role>, 'id'>) {
     return this.model.findByIdAndUpdate(
       role._id,
       {

@@ -203,9 +203,9 @@ export class ProjectsResolver {
   }
 
   @ResolveField()
-  async roles(@Parent() author: Project) {
+  async roles(@Parent() project: Project) {
     return this.rolesService.find({
-      project: new Types.ObjectId(author.id)
+      project: new Types.ObjectId(project.id)
     })
   }
 

@@ -25,7 +25,7 @@ import { ForbiddenError } from 'apollo-server-express'
 import { PermissionEnum } from '@app/roles/enums/role.enum'
 import { ProposalStatus } from '@app/proposal/enums/proposal.enum'
 import { GetProposalFilter } from '@app/proposal/filters/get-proposal.filter'
-import { JWTAuthGuard } from '../../guards/jwt.guard'
+import { JWTAuthGuard } from '@guards/jwt.guard'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import { PUB_SUB } from '@apollo/pubsub.module'
 import ChanelEnum from '@apollo/chanel.enum'
@@ -65,6 +65,9 @@ export class ProposalResolver {
       project: _project._id
     })
     if (role) {
+      await this.pubSub.publish(ChanelEnum.NOTIFY, {
+        subNotify: { user, msg: 'You already has role' }
+      })
       throw new ForbiddenError('You already has role')
     }
     // check user đã gửi đề nghị hay chưa
@@ -73,6 +76,9 @@ export class ProposalResolver {
       project: _project._id
     })
     if (_proposal) {
+      await this.pubSub.publish(ChanelEnum.NOTIFY, {
+        subNotify: { user, msg: 'You already has proposal' }
+      })
       throw new ForbiddenError('You already has proposal')
     }
 
@@ -152,29 +158,30 @@ export class ProposalResolver {
     if (!this.usersService.isAdmin(user)) {
       // Ko dc phép duyệt owner
       if (project.owner.toString() !== user._id.toString()) {
+        await this.pubSub.publish(ChanelEnum.NOTIFY, {
+          subNotify: { user, msg: 'You are not allowed to do this' }
+        })
         throw new ForbiddenError('You are not allowed to do this')
       }
 
-      const _role = await this.rolesService.findOne({
-        project: project._id,
-        user: user._id
-      })
-      // KO có quyền
-      if (!_role) {
-        throw new ForbiddenError('You are not allowed to do this')
-      }
-      // KO đủ quyền
-      if (_role.permissions.includes(PermissionEnum.UPDATE_ROLE)) {
-        throw new ForbiddenError('You are not allowed to do  this')
-      }
-    }
-
-    const existRole = await this.rolesService.findOne({
-      project: project._id,
-      user: _proposal.user
-    })
-    if (existRole) {
-      throw new ForbiddenError('User already has role')
+      // const _role = await this.rolesService.findOne({
+      //   project: project._id,
+      //   user: user._id
+      // })
+      // // KO có quyền
+      // if (!_role) {
+      //   await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      //     subNotify: { user, msg: 'You are not allowed to do this' }
+      //   })
+      //   throw new ForbiddenError('You are not allowed to do this')
+      // }
+      // // KO đủ quyền
+      // if (_role.permissions.includes(PermissionEnum.UPDATE_ROLE)) {
+      //   await this.pubSub.publish(ChanelEnum.NOTIFY, {
+      //     subNotify: { user, msg: 'You are not allowed to do this' }
+      //   })
+      //   throw new ForbiddenError('You are not allowed to do  this')
+      // }
     }
 
     await this.pubSub.publish(ChanelEnum.NOTIFY, {
@@ -182,6 +189,30 @@ export class ProposalResolver {
     })
 
     // Người kiểm duyệt chỉ dc phép duyệt hoặc từ chối
+    if (input.status !== _proposal.status) {
+      // tác đôộng vào role
+      if (input.status === ProposalStatus.APPROVED) {
+        // nhaận bạn mới vào => thêm vào role
+        await this.rolesService.update(
+          {
+            _id: _proposal.role
+          },
+          {
+            user: _proposal.user
+          }
+        )
+      } else if (_proposal.status === ProposalStatus.APPROVED) {
+        // từ chối => xóa role
+        await this.rolesService.update(
+          {
+            _id: _proposal.role
+          },
+          {
+            user: null
+          }
+        )
+      }
+    }
     return this.proposalService.update(_proposal, {
       note: input.note,
       status: input.status

@@ -60,6 +60,7 @@ export class RolesResolver {
         project: _project._id,
         name: input.name,
         permissions: input.permissions,
+        content: input.content,
         group: Math.round(Math.random() * 10000000)
       })
       .map((item, index) => ({
@@ -112,7 +113,7 @@ export class RolesResolver {
 
     const doc: AnyKeys<Role> = getInput(input, ['id', 'user'])
 
-    if (input.user) {
+    if (Object.keys(input).includes('user')) {
       const _user = await this.usersService.findOne({
         _id: new Types.ObjectId(input.user)
       })
@@ -189,6 +190,8 @@ export class RolesResolver {
   //
   @ResolveField()
   async user(@Parent() author: Role) {
-    return this.usersService.findOne({ _id: author.user })
+    if (author.user) {
+      return this.usersService.findOne({ _id: author.user })
+    }
   }
 }

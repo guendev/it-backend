@@ -14,7 +14,7 @@ export class UpdateRoleInput extends OmitType(PartialType(CreateRoleInput), [
   @IsObjectID()
   id: Types.ObjectId
 
-  @Field(() => ID)
+  @Field(() => ID, { nullable: true })
   @IsOptional()
   @IsObjectID()
   user: Types.ObjectId
