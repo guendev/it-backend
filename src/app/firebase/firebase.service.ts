@@ -43,6 +43,7 @@ export class FirebaseService {
         return user
       }
       const record = await this.defaultApp.auth().getUser(firebaseUser.uid)
+      console.log(record)
       return this.usersService.create(record)
     }
   }

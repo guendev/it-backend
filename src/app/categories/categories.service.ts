@@ -13,6 +13,26 @@ export class CategoriesService {
     @InjectModel(Category.name) private model: Model<CategoryDocument>
   ) {}
 
+  instance() {
+    return Promise.all(
+      ['Web', 'App', 'Library', 'Plugin'].map(
+        (name) =>
+          new Promise((resolve) => {
+            resolve(
+              this.model.findOneAndUpdate(
+                { name },
+                {
+                  content: '',
+                  slug: name.toLowerCase() + Math.round(Math.random() * 1000)
+                },
+                { upsert: true }
+              )
+            )
+          })
+      )
+    )
+  }
+
   async create(input: CreateCategoryInput) {
     return this.model.create(input)
   }
