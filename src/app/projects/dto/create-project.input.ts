@@ -36,7 +36,6 @@ export class CreateProjectInput {
 
   @Field(() => [String], { nullable: true, defaultValue: [] })
   @IsArray()
-  @ArrayMinSize(1)
   technologies: string[]
 
   @Field(() => [Float, Float])
