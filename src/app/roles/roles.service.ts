@@ -26,14 +26,19 @@ export class RolesService {
   }
 
   async find(filter: FilterQuery<RoleDocument>) {
-    return this.model.find(filter)
+    return this.model.find(filter).sort({
+      order: 1
+    })
   }
 
   async findOne(filter: FilterQuery<RoleDocument>) {
     return this.model.findOne(filter)
   }
 
-  async update(role: Pick<RoleDocument, "_id">, doc: Omit<AnyKeys<Role>, 'id'>) {
+  async update(
+    role: Pick<RoleDocument, '_id'>,
+    doc: Omit<AnyKeys<Role>, 'id'>
+  ) {
     return this.model.findByIdAndUpdate(
       role._id,
       {
